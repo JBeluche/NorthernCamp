@@ -8,6 +8,12 @@ public class NorthernCamp : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "NavigationSystem", "AIModule" });
+		//Stuff I added:
+		//	Landscape: needed in the Loose Pawn Camera to cast to landscape 
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "NavigationSystem", "Landscape", "AIModule" });
+        
+
+        
+        
     }
 }

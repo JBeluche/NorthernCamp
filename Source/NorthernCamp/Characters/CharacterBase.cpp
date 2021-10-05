@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Characters/CharacterBase.h"
+#include "NorthernCamp/Characters/CharacterBase.h"
 
 // Sets default values
 ACharacterBase::ACharacterBase()

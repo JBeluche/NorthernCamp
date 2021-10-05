@@ -4,109 +4,214 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
-#include "NorthernCampCharacter.h"
+//#include "ArenCharacter.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Engine/World.h"
+#include "Blueprint/UserWidget.h"
+//#include "NorthernCamp/Pawns/CampPawn.h"
+#include "NorthernCamp/Pawns/LooseCameraPawn.h"
+#include "EngineUtils.h"
 
 ANorthernCampPlayerController::ANorthernCampPlayerController()
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
+
+	/*ConstructorHelpers::FClassFinder<UUserWidget> WBPControlsCharacter(TEXT("/Game/Blueprints/Widgets/WBP_ControlsPlayer"));
+	ConstructorHelpers::FClassFinder<UUserWidget> WBPControlsCamp(TEXT("/Game/Blueprints/Widgets/WBP_ControlsCamp"));
+	ConstructorHelpers::FClassFinder<UUserWidget> DialogWidgetClass(TEXT("/Game/Blueprints/Widgets/WBP_Dialog"));
+
+	CharacterControlClass = WBPControlsCharacter.Class;
+	CampControlClass = WBPControlsCamp.Class;
+	DialogWidget = DialogWidgetClass.Class;*/
+
+	CampPawn = nullptr;
+	MainPlayerPawn = nullptr;
+	SelectedCharacter = nullptr;
+}
+
+void ANorthernCampPlayerController::BeginPlay()
+{
+	//Seting playable pawns.
+	for (TActorIterator<ACampPawn> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		CampPawn = *ActorItr;
+	}
+	for (TActorIterator<AMainPlayerPawn> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		MainPlayerPawn = *ActorItr;
+	}
+
+	CurrentPawnEnum = ECurrentPawn::ArenCharacter;
+	SetOwner();
+	FingerTouchDuration = 0.0f;
+	LastFingerTouchDuration = 0.0f;
 }
 
 void ANorthernCampPlayerController::PlayerTick(float DeltaTime)
 {
+
 	Super::PlayerTick(DeltaTime);
 
-	// keep updating the destination every tick while desired
-	if (bMoveToMouseCursor)
+	//Player controls
+	/*if (CurrentPawnEnum == ECurrentPawn::CAMP)
 	{
-		MoveToMouseCursor();
-	}
-}
+		GetInputTouchState(ETouchIndex::Touch1, NewTouchLocation.X, NewTouchLocation.Y, bIsFingerTouching);
+		if (bIsFingerTouching)
+		{
+			if (MyOwner)
+			{
+				float NewRotation = PreviousTouchLocation.X - NewTouchLocation.X;
 
+				FRotator CurrentRotation = MyOwner->GetActorRotation();
+
+				if (PreviousTouchLocation.X == 0.0f)
+				{
+					NewRotation = 0.0f;
+				}
+
+				MyOwner->SetActorRotation(FRotator(CurrentRotation.Pitch, (CurrentRotation.Yaw + NewRotation), CurrentRotation.Roll));
+			}
+			PreviousTouchLocation = NewTouchLocation;
+		}
+		else
+		{
+			PreviousTouchLocation.X = 0.0f;
+		}
+	}
+	else if (CurrentPawnEnum == ECurrentPawn::ARENCHARACTER)
+	{*/
+
+		GetInputTouchState(ETouchIndex::Touch1, NewTouchLocation.X, NewTouchLocation.Y, bIsFingerTouching);
+		if (bIsFingerTouching)
+		{
+
+			FingerTouchDuration = (FingerTouchDuration + 1.0f);
+
+			GetHitResultUnderFinger(
+				ETouchIndex::Touch1,
+				ECC_Pawn,
+				true,
+				LastTouchHitResults);
+
+			//If this is the case, do a cast?
+			if (MyOwner)
+			{
+				FVector CurrentLocation = MyOwner->GetActorLocation();
+				float FloatToAddOnY = (PreviousTouchLocation.X - NewTouchLocation.X) * 5.0f;
+				float FloatToAddOnX = (PreviousTouchLocation.Y - NewTouchLocation.Y) * 5.0f;
+
+				if (PreviousTouchLocation.X == 0.0f)
+				{
+					FloatToAddOnY = 0.0f;
+				}
+				if (PreviousTouchLocation.Y == 0.0f)
+				{
+					FloatToAddOnX = 0.0f;
+				}
+				FVector NewLocation = MyOwner->GetActorLocation();
+				//Up and Down swipe is X
+				FloatToAddOnX = -1 * FloatToAddOnX;
+				NewLocation.X = CurrentLocation.X + FloatToAddOnX;
+				//Left and right swipe is Y
+				NewLocation.Y = CurrentLocation.Y + FloatToAddOnY;
+
+				MyOwner->SetActorLocation(NewLocation);
+				//Look at how much the difference was to make a sort of speed when the finger is released
+				PreviousTouchLocation = NewTouchLocation;
+			}
+		}
+	/*	else
+		{
+			LastFingerTouchDuration = FingerTouchDuration;
+			FingerTouchDuration = 0.0f;
+
+			if (LastFingerTouchDuration < 50.0f && LastFingerTouchDuration > 2.0f)
+			{
+				if (SelectedCharacter != NULL)
+				{
+					UAIBlueprintHelperLibrary::SimpleMoveToLocation(SelectedCharacter->GetController(), LastTouchHitResults.Location);
+				}
+				else if (Cast<ACharacterBase>(LastTouchHitResults.Actor))
+				{
+					SelectedCharacter = Cast<ACharacterBase>(LastTouchHitResults.Actor);
+
+					if (SelectedCharacter->SetToSelectedPlayer())
+					{
+						UE_LOG(LogTemp, Display, TEXT("Actor was selected"));
+					}
+					else
+					{
+						SelectedCharacter = nullptr;
+						UE_LOG(LogTemp, Display, TEXT("Actor cannot be selected"));
+					}
+				}
+			}
+
+			PreviousTouchLocation.X = 0.0f;
+			PreviousTouchLocation.Y = 0.0f;
+		}
+	}*/
+
+}
+/*
 void ANorthernCampPlayerController::SetupInputComponent()
 {
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("SetDestination", IE_Pressed, this, &ANorthernCampPlayerController::OnSetDestinationPressed);
-	InputComponent->BindAction("SetDestination", IE_Released, this, &ANorthernCampPlayerController::OnSetDestinationReleased);
-
-	// support touch devices 
-	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &ANorthernCampPlayerController::MoveToTouchLocation);
-	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &ANorthernCampPlayerController::MoveToTouchLocation);
-
-	InputComponent->BindAction("ResetVR", IE_Pressed, this, &ANorthernCampPlayerController::OnResetVR);
+	Controls = CreateWidget<UUserWidget>(this, CharacterControlClass, FName("Character Controls"));
+	Controls->AddToViewport();
 }
 
-void ANorthernCampPlayerController::OnResetVR()
+void ANorthernCampPlayerController::SwitchPawn(ECurrentPawn NewPawn)
 {
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
-}
+	CurrentPawnEnum = NewPawn;
+	if(Controls){Controls->RemoveFromViewport();}
+		
+		UnPossess();
+	
 
-void ANorthernCampPlayerController::MoveToMouseCursor()
-{
-	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
+	if (CurrentPawnEnum == ECurrentPawn::ARENCHARACTER)
 	{
-		if (ANorthernCampCharacter* MyPawn = Cast<ANorthernCampCharacter>(GetPawn()))
-		{
-			if (MyPawn->GetCursorToWorld())
-			{
-				UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, MyPawn->GetCursorToWorld()->GetComponentLocation());
-			}
-		}
+		Possess(MainPlayerPawn);
+		SetOwner();
+		//Get the player charater on the map and focus camera
+
+		Controls = CreateWidget<UUserWidget>(this, CharacterControlClass, FName("Character Controls"));
+		Controls->AddToViewport();
+
 	}
-	else
+	else if (CurrentPawnEnum == ECurrentPawn::CAMP)
 	{
-		// Trace to see what is under the mouse cursor
-		FHitResult Hit;
-		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+		Possess(CampPawn);
+		SetOwner();
 
-		if (Hit.bBlockingHit)
-		{
-			// We hit something, move there
-			SetNewMoveDestination(Hit.ImpactPoint);
-		}
+		Controls = CreateWidget<UUserWidget>(this, CampControlClass, FName("Camp Controls"));
+		Controls->AddToViewport();
+
 	}
-}
-
-void ANorthernCampPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
-{
-	FVector2D ScreenSpaceLocation(Location);
-
-	// Trace to see what is under the touch location
-	FHitResult HitResult;
-	GetHitResultAtScreenPosition(ScreenSpaceLocation, CurrentClickTraceChannel, true, HitResult);
-	if (HitResult.bBlockingHit)
+	else if(CurrentPawnEnum == ECurrentPawn::DIALOG)
 	{
-		// We hit something, move there
-		SetNewMoveDestination(HitResult.ImpactPoint);
+
+		Possess(MainPlayerPawn);
+		SetOwner();
+		UE_LOG(LogTemp, Error, TEXT("Dialog is set"));
+
 	}
-}
 
-void ANorthernCampPlayerController::SetNewMoveDestination(const FVector DestLocation)
+
+}*/
+
+void ANorthernCampPlayerController::SetOwner()
 {
-	APawn* const MyPawn = GetPawn();
-	if (MyPawn)
-	{
-		float const Distance = FVector::Dist(DestLocation, MyPawn->GetActorLocation());
-
-		// We need to issue move command only if far enough in order for walk animation to play correctly
-		if ((Distance > 120.0f))
-		{
-			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
-		}
-	}
+	MyOwner = Cast<AActor>(GetPawn());
 }
-
-void ANorthernCampPlayerController::OnSetDestinationPressed()
+/*
+UUserWidget* ANorthernCampPlayerController::GetDialogWidget()
 {
-	// set flag to keep updating destination until released
-	bMoveToMouseCursor = true;
-}
+	return CreateWidget<UUserWidget>(this, DialogWidget, FName("Dialog Controls"));
+}*/
 
-void ANorthernCampPlayerController::OnSetDestinationReleased()
-{
-	// clear flag to indicate we should stop updating the destination
-	bMoveToMouseCursor = false;
-}
+
+
