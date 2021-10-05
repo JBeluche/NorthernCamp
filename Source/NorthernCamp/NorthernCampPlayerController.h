@@ -8,9 +8,7 @@
 
 //Classes
 class UUserWidget;
-class AArenCharacter;
-class ACampPawn;
-class AMainPlayerPawn;
+class ALooseCameraPawn;
 class ACharacterBase;
 
 
@@ -47,7 +45,7 @@ protected:
 
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;
-	virtual void SetupInputComponent() override;
+	//virtual void SetupInputComponent() override;
 
 private:
 
@@ -58,11 +56,11 @@ private:
 	UUserWidget* Controls;
 	AActor* MyOwner;
 	
-	AArenCharacter* ControlledCharater;
+	//AArenCharacter* ControlledCharater;
 
 	//Varialbes Blueprint
-	ACampPawn* CampPawn;
-	AMainPlayerPawn* MainPlayerPawn;
+	//ACampPawn* CampPawn;
+	ALooseCameraPawn* LooseCameraPawn;
 	ACharacterBase* SelectedCharacter;
 
 

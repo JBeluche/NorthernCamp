@@ -25,21 +25,21 @@ ANorthernCampPlayerController::ANorthernCampPlayerController()
 	CampControlClass = WBPControlsCamp.Class;
 	DialogWidget = DialogWidgetClass.Class;*/
 
-	CampPawn = nullptr;
-	MainPlayerPawn = nullptr;
+	//CampPawn = nullptr;
+	LooseCameraPawn = nullptr;
 	SelectedCharacter = nullptr;
 }
 
 void ANorthernCampPlayerController::BeginPlay()
 {
 	//Seting playable pawns.
-	for (TActorIterator<ACampPawn> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	/*for (TActorIterator<ACampPawn> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
 		CampPawn = *ActorItr;
-	}
-	for (TActorIterator<AMainPlayerPawn> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	}*/
+	for (TActorIterator<ALooseCameraPawn> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
-		MainPlayerPawn = *ActorItr;
+		LooseCameraPawn = *ActorItr;
 	}
 
 	CurrentPawnEnum = ECurrentPawn::ArenCharacter;
@@ -121,12 +121,12 @@ void ANorthernCampPlayerController::PlayerTick(float DeltaTime)
 				PreviousTouchLocation = NewTouchLocation;
 			}
 		}
-	/*	else
+		else
 		{
 			LastFingerTouchDuration = FingerTouchDuration;
 			FingerTouchDuration = 0.0f;
 
-			if (LastFingerTouchDuration < 50.0f && LastFingerTouchDuration > 2.0f)
+			/*if (LastFingerTouchDuration < 50.0f && LastFingerTouchDuration > 2.0f)
 			{
 				if (SelectedCharacter != NULL)
 				{
@@ -146,12 +146,12 @@ void ANorthernCampPlayerController::PlayerTick(float DeltaTime)
 						UE_LOG(LogTemp, Display, TEXT("Actor cannot be selected"));
 					}
 				}
-			}
+			}*/
 
 			PreviousTouchLocation.X = 0.0f;
 			PreviousTouchLocation.Y = 0.0f;
-		}
-	}*/
+		//}
+	}
 
 }
 /*
