@@ -10,7 +10,8 @@ public class NorthernCamp : ModuleRules
 
 		//Stuff I added:
 		//	Landscape: needed in the Loose Pawn Camera to cast to landscape 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "NavigationSystem", "Landscape", "AIModule" });
+		//	UMG: To use userwidget blueprints
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "NavigationSystem", "Landscape", "AIModule", "UMG" });
         
 
         

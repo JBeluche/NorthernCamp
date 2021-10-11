@@ -9,6 +9,7 @@
 //Classes
 class UUserWidget;
 class ALooseCameraPawn;
+class ACharacterHero;
 class ACharacterBase;
 
 
@@ -61,7 +62,7 @@ private:
 	//Varialbes Blueprint
 	//ACampPawn* CampPawn;
 	ALooseCameraPawn* LooseCameraPawn;
-	ACharacterBase* SelectedCharacter;
+	ACharacterHero* SelectedHero;
 
 
 	FVector2D PreviousTouchLocation;
@@ -69,12 +70,25 @@ private:
 	bool bFingerReleased;
 	bool bIsFingerTouching;
 	float FingerTouchDuration;
-	float LastFingerTouchDuration;
 	FHitResult LastTouchHitResults;
+	FVector TargetLocation;
+	bool bTargetLocationSet;
 
+	bool bCameraIsMoving;
+	int FingerTapAmount;
+	float LastTimeFingerTouched;
+	float Time;
+	bool FingerTouched;
+	float StartingLocationFingerX;
+	float StartingLocationFingerY;
 	
 	//Functions
-	void SetOwner();
+	void SetNewOwner();
+	void DoubleTapTouchCondition();
+	void MoveCameraAccordingToFinger();
+	void KeepCameraInHeroBounds(float DeltaTime);
+
+	void FingerTouchHandler(float DeltaTime);
 
 };
 

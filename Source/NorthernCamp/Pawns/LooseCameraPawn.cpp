@@ -50,7 +50,7 @@ void ALooseCameraPawn::SetPositionRelativeToLandscape()
 	TArray<FHitResult> OutHits;
 	
 	FVector StartLocation = GetActorLocation();
-	FVector EndLocation = FVector(StartLocation.X, StartLocation.Y, (StartLocation.Z - 1000.0f));
+	FVector EndLocation = FVector(StartLocation.X, StartLocation.Y, (StartLocation.Z - 10000.0f));
 
 	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
 	RV_TraceParams.bTraceComplex = true;
@@ -74,3 +74,12 @@ void ALooseCameraPawn::SetPositionRelativeToLandscape()
 		}
 	}
 }
+
+//Check if the camera is still inside the bounds of the hero he should follow
+FVector ALooseCameraPawn::GetSelectedHeroPosition()
+{
+	UE_LOG(LogTemp, Error, TEXT("Giving you the vector"));
+
+	return FVector(0.0f, 0.0f, 0.0f);
+}
+

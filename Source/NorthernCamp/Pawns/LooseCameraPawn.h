@@ -31,6 +31,8 @@ public:
 
 	void SetPositionRelativeToLandscape();
 
+	FVector GetSelectedHeroPosition();
+
 
 	private:
 	UBoxComponent* BoxComponent;
