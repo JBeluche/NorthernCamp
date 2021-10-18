@@ -26,4 +26,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+
+	float CurrentSleep = 100.0f;
+	float CurrentHunger = 100.0f;
+	float CurrentThirst = 100.0f;
+	float CurrentHealth = 100.0f;
+
+	
 };

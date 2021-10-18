@@ -4,14 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "NorthernCampPlayerController.generated.h"
+#include "NorthernCamp/Characters/CharacterHero.h"
 
+#include "NorthernCampPlayerController.generated.h"
 //Classes
 class UUserWidget;
 class ALooseCameraPawn;
-class ACharacterHero;
-class ACharacterBase;
 
+class ACharacterBase;
+class ACharacterSettler;
+class UScrollBox;
 
 //Enums 
 UENUM(BlueprintType)
@@ -20,6 +22,12 @@ enum class ECurrentPawn : uint8
 	ArenCharacter UMETA(DisplayName = "Aren Character"),
 	Camp UMETA(DisplayName = "Camp"),
 	
+};
+
+UENUM(BlueprintType)
+enum class ECurrentUI : uint8 
+{
+	SettlersInfo UMETA(DisplayName = "Information Settler"),
 };
 
 UCLASS()
@@ -36,6 +44,10 @@ public:
 	ECurrentPawn CurrentPawnEnum;
 
 	UUserWidget* GetDialogWidget();
+	void SetSelectedHero(EHero CharacterHeroEnum);
+
+	
+	ACharacterSettler* SelectedSettler;
 
 
 protected:
@@ -46,14 +58,16 @@ protected:
 
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;
-	//virtual void SetupInputComponent() override;
+	virtual void SetupInputComponent() override;
 
 private:
 
 	//Varaibles C++
-	TSubclassOf<class UUserWidget> CharacterControlClass;
+	TSubclassOf<class UUserWidget> LooseCameraUserWidget;
 	TSubclassOf<class UUserWidget> CampControlClass;
 	TSubclassOf<class UUserWidget> DialogWidget;
+	TSubclassOf<class UUserWidget> SettlerInfoUserWidget;
+	
 	UUserWidget* Controls;
 	AActor* MyOwner;
 	
@@ -81,12 +95,18 @@ private:
 	bool FingerTouched;
 	float StartingLocationFingerX;
 	float StartingLocationFingerY;
+
+	bool bIsInMenu;
+
+	UScrollBox* CurrentScrollBar;
 	
 	//Functions
 	void SetNewOwner();
 	void DoubleTapTouchCondition();
 	void MoveCameraAccordingToFinger();
 	void KeepCameraInHeroBounds(float DeltaTime);
+	void SelectSettlerCondition();
+	void UpdateUI(ECurrentUI NewCurrentUI);
 
 	void FingerTouchHandler(float DeltaTime);
 

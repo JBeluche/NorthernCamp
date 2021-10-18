@@ -13,5 +13,10 @@ UCLASS()
 class NORTHERNCAMP_API ACharacterSettler : public ACharacterBase
 {
 	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText Name;
 	
 };

@@ -5,6 +5,12 @@
 #include "NorthernCampCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
+
+///////
+// The game mode is handling the following:
+// Time of day | Resources |
+// 
+///////
 ANorthernCampGameMode::ANorthernCampGameMode()
 {
 	// use our custom PlayerController class
@@ -16,4 +22,9 @@ ANorthernCampGameMode::ANorthernCampGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
+	
+	
+	
 }
+
