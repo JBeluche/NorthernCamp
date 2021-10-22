@@ -10,7 +10,6 @@
 //Classes
 class UUserWidget;
 class ALooseCameraPawn;
-
 class ACharacterBase;
 class ACharacterSettler;
 class UScrollBox;
@@ -97,6 +96,8 @@ private:
 	float StartingLocationFingerY;
 
 	bool bIsInMenu;
+
+
 
 	UScrollBox* CurrentScrollBar;
 	

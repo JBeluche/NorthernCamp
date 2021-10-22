@@ -8,6 +8,7 @@
 
 class ADirectionalLight;
 
+
 UCLASS()
 class NORTHERNCAMP_API ADayNightActorController : public AActor
 {
@@ -27,48 +28,134 @@ public:
 	ADirectionalLight* SunLigth;
 
 	FTimerHandle TimerHandle;
+	ULightComponent* SunAndMoonLightComponent;
 
 	float CurrentTimeMinutes;
 	float CurrentTimeHours;
 
 	float SunLocationZ;
 	float TotalDayLightTimeInVirtualMinutes;
-	float AngleToAddOnZ;
-	float AngleToAddOnY;
+	
+	float DayAngleToAddOnZ;
+	float DayAngleToAddOnY;
+
+	float TemperatureToAddBetweenNightAndGoldenHour;
+	float TemperatureToAddBetweenGoldenHourAndDay;
+	
+	float TemperatureToAddBetweenDayAndGoldenHour;
+	float TemperatureToAddBetweenGoldenHourAndNight;
+
+	float LuminositiToAddBetweenNightAndGoldenHour;
+	float LuminositiToAddBetweenGoldenHourAndNight;
+	float LuminositiToAddBetweenDayAndGoldenHour;
+	float LuminositiToAddBetweenGoldenHourAndDay;
+	
+	float NightAngleToAddOnZ;
+	float NightAngleToAddOnY;
+
+	FLinearColor SunColor;
+	
 	float SunLocationY;
 
-	bool bSunGoesDone;
-	bool bIsDayTime;
-	bool bSunSetToCurrentTime;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//Helpers
+	//Get the current time and check if the sun is going up or down.
+	float CurrentTimeInMinutes;
+	
+	float SunriseStartInMinutes;
+	float SunriseMidwayInMinutes;
+	float SunriseEndInMinutes;
+	
+	float SunpeakInMinutes;
+	
+	float SunsetStartInMinutes;
+	float SunsetMidwayInMinutes;
+	float SunsetEndInMinutes;
+
+	float MoonSetStartInMinutes;
+	float MoonRiseEndInMinutes;
+
+	//When everything started or ended.
+	float CurrentMinutesSinceSunriseStart;
+	float CurrentMinutesSinceSunriseMidway;
+	float CurrentMinutesSinceSunriseEnd;
+	
+	float CurrentMinutesSinceSunPeak;
+	
+	float CurrentMinutesSinceSunsetStart;
+	float CurrentMinutesSinceSunsetMidway;
+	float CurrentMinutesSinceSunsetEnd;
+
+	float CurrentMinutesSinceMoonSetStart;
+	float CurrentMinutesSinceMoonRiseEnd;
+
+
+	//Locations
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Locations")
 	float SunPositionHighestPoint;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Locations")
 	float SunPositionLowestPoint;
-
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float SunriseHour;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Locations")
+	float MoonStartLocation;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Locations")
+	float MoonEndLocation;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float SunsetHour;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Locations")
 	float SunRisingPosition;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Locations")
 	float SunSettingPosition;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	
+	//Light Options
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Light options")
+	float SunLumosity;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Light options")
+    float MoonLumosity;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Light options")
+	float TemperatureNight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Light options")
+	float TemperatureDay;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Light options")
+	float TemperatureGoldenhours;
+
+	//Time options
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time options")
+	float SunriseHour;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time options")
+	float SunsetHour;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time options")
 	float SecondsPerHour;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time options")
 	float StartingHour;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time options")
 	float TimeUpdatesInterval;
+
+	//Durations
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Durations")
+	float SunriseDuration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Durations")
+	float SunsetDuration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Durations")
+	float MoonRiseDuration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Durations")
+	float MoonSetDuration;
 	
+
 	void SetTimeTo(float HourToSet, float MinuteToSet);
 
 	void MoveTime();

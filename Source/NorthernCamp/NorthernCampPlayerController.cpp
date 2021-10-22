@@ -14,6 +14,8 @@
 #include "EngineUtils.h"
 #include "Math/UnrealMathUtility.h"
 #include "Components/ScrollBox.h"
+
+
 ///////
 //	
 ///////
@@ -53,13 +55,16 @@ void ANorthernCampPlayerController::BeginPlay()
 	{
 		LooseCameraPawn = *ActorItr;
 	}
+
 	SetSelectedHero(EHero::Will);
 
 	CurrentPawnEnum = ECurrentPawn::ArenCharacter;
 	SetNewOwner();
 
 	FingerTouchDuration = 0.0f;
-
+	//Command to make the shadows appear for longer distances.
+	GEngine->Exec( GetWorld(), TEXT( "r.Shadow.RadiusThreshold 0.01" ) );
+	GEngine->Exec( GetWorld(), TEXT( "stat fps" ) );
 }
 
 void ANorthernCampPlayerController::PlayerTick(float DeltaTime)
@@ -69,6 +74,9 @@ void ANorthernCampPlayerController::PlayerTick(float DeltaTime)
 
 	//Easy way to measure time.
 	Time = Time + 1.0f;
+	
+	
+
 
 	KeepCameraInHeroBounds(DeltaTime);
 	if(!bCameraIsMoving)
@@ -186,9 +194,6 @@ void ANorthernCampPlayerController::FingerTouchHandler(float DeltaTime)
 			ECC_Pawn,
 			true,
 			LastTouchHitResults);
-
-		UE_LOG(LogTemp, Error, TEXT("Finger touching"));
-	
 
 		MoveCameraAccordingToFinger();
 		

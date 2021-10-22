@@ -24,7 +24,7 @@ ANorthernCampGameMode::ANorthernCampGameMode()
 	}
 
 	
-	
+
 	
 }
 

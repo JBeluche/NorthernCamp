@@ -9,6 +9,7 @@
 
 
 class ANorthernCampPlayerController;
+class ADayNightActorController;
 
 
 UCLASS()
@@ -16,6 +17,10 @@ class NORTHERNCAMP_API ULooseCameraMainUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+	public:
+
+	
+	
 	protected:
 	virtual bool Initialize();
 
@@ -30,6 +35,13 @@ class NORTHERNCAMP_API ULooseCameraMainUserWidget : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ButtonTrader;
 
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* TB_Clock;
+
+	FTimerHandle UpdateClockTimerHandle;
+	void SetClock();
+
+	ADayNightActorController* DayNightController;
 	
 	UFUNCTION()
 	void SwitchToCamp();

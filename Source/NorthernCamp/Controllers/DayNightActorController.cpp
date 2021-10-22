@@ -2,6 +2,8 @@
 
 
 #include "NorthernCamp/Controllers/DayNightActorController.h"
+
+#include "Components/LightComponent.h"
 #include "Engine/DirectionalLight.h"
 
 
@@ -10,7 +12,6 @@ ADayNightActorController::ADayNightActorController()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
 }
 
 // Called when the game starts or when spawned
@@ -23,10 +24,39 @@ void ADayNightActorController::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ADayNightActorController::MoveTime, TimeUpdatesInterval, true);
 
 	TotalDayLightTimeInVirtualMinutes = (SunsetHour - SunriseHour) * 60;
-	AngleToAddOnZ = (SunSettingPosition - SunRisingPosition) / ((SecondsPerHour / TimeUpdatesInterval) * (SunsetHour - SunriseHour));
-	AngleToAddOnY = ((SunPositionHighestPoint - SunPositionLowestPoint) / ((SecondsPerHour / TimeUpdatesInterval) * (SunsetHour - SunriseHour)) * 2);
+	DayAngleToAddOnZ = (SunSettingPosition - SunRisingPosition) / ((SecondsPerHour / TimeUpdatesInterval) * (SunsetHour - SunriseHour));
+	DayAngleToAddOnY = ((SunPositionHighestPoint - SunPositionLowestPoint) / ((SecondsPerHour / TimeUpdatesInterval) * (SunsetHour - SunriseHour)) * 2);
 
+	NightAngleToAddOnZ = (MoonEndLocation - MoonStartLocation) / ((SecondsPerHour / TimeUpdatesInterval) * ((24.0f - SunsetHour) + SunriseHour));
+
+	//Moonset - Moonrise
+	LuminositiToAddBetweenNightAndGoldenHour = MoonLumosity / ((SecondsPerHour / TimeUpdatesInterval) * ((1 * MoonSetDuration) / 60));
+	LuminositiToAddBetweenGoldenHourAndNight = MoonLumosity / ((SecondsPerHour / TimeUpdatesInterval) * ((1 * MoonRiseDuration) / 60));
+
+	//Sunrise
+	TemperatureToAddBetweenGoldenHourAndDay = (TemperatureDay - TemperatureGoldenhours) / ((SecondsPerHour / TimeUpdatesInterval) * ((1 * SunriseDuration) / 60));
+	LuminositiToAddBetweenGoldenHourAndDay = SunLumosity / ((SecondsPerHour / TimeUpdatesInterval) * ((1 * SunriseDuration) / 60));
+
+	//Sunset
+	TemperatureToAddBetweenDayAndGoldenHour = (TemperatureDay - TemperatureGoldenhours) / ((SecondsPerHour / TimeUpdatesInterval) * ((1 * SunsetDuration) / 60));
+	LuminositiToAddBetweenDayAndGoldenHour = SunLumosity / ((SecondsPerHour / TimeUpdatesInterval) * ((1 * SunsetDuration) / 60));
+
+
+
+	SunAndMoonLightComponent = Cast<ULightComponent>(SunLigth->GetLightComponent());
+
+	SunriseStartInMinutes = SunriseHour * 60;
+	SunriseMidwayInMinutes = SunriseHour * 60 + (SunriseDuration / 2);
+	SunriseEndInMinutes = SunriseHour * 60 + SunriseDuration;
 	
+	SunpeakInMinutes = (SunriseHour * 60) + TotalDayLightTimeInVirtualMinutes / 2;
+	
+	SunsetStartInMinutes = (SunriseHour * 60) + TotalDayLightTimeInVirtualMinutes - SunsetDuration;
+	SunsetMidwayInMinutes = (SunriseHour * 60) + TotalDayLightTimeInVirtualMinutes - (SunsetDuration / 2);
+	SunsetEndInMinutes = (SunriseHour * 60) + TotalDayLightTimeInVirtualMinutes;
+
+	MoonSetStartInMinutes = SunriseStartInMinutes - MoonSetDuration;
+	MoonRiseEndInMinutes = SunsetEndInMinutes + MoonRiseDuration;
 }
 
 void ADayNightActorController::SetTimeTo(float HourToSet, float MinuteToSet)
@@ -37,9 +67,13 @@ void ADayNightActorController::SetTimeTo(float HourToSet, float MinuteToSet)
 
 void ADayNightActorController::MoveTime()
 {
+	//////
+	// Advances the time
+	//////
+	
 	//Check time speed and move time according to the calculation
 	CurrentTimeMinutes = CurrentTimeMinutes + (60.0f / (SecondsPerHour / TimeUpdatesInterval));
-
+	
 	if(CurrentTimeMinutes >= 60.0f)
 	{
 		CurrentTimeHours++;
@@ -47,121 +81,152 @@ void ADayNightActorController::MoveTime()
 		//if(CurrentTimeMinutes > 60.0f){CurrentTimeMinutes = 60.0f / (SecondsPerHour / TimeUpdatesInterval);}
 		if(CurrentTimeMinutes >= 60.0f){CurrentTimeMinutes = CurrentTimeMinutes - 60.0f; }
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Current Time: %f:%f"), FMath::RoundHalfToZero(CurrentTimeHours), FMath::RoundHalfToZero(CurrentTimeMinutes));
 
+	//Get time frames to use.
+	CurrentTimeInMinutes = (CurrentTimeHours * 60) + CurrentTimeMinutes; 
 	
-		//Get the current time and check if the sun is going up or down.
-		float CurrentTimeInMinutes = (CurrentTimeHours * 60) + CurrentTimeMinutes; //380
-		float MorningTimeStartInMinutes = SunriseHour * 60;
-		float MiddayTimeStartInMinutes = (SunriseHour * 60) + TotalDayLightTimeInVirtualMinutes / 2;
-		float DayTimeEndsInMinutes = (SunriseHour * 60) + TotalDayLightTimeInVirtualMinutes;
-		float CurrentMinutesSinceSunrise = CurrentTimeInMinutes - MorningTimeStartInMinutes;
-		float CurrentMinutesSinceMidday = CurrentTimeInMinutes - MiddayTimeStartInMinutes;
+	CurrentMinutesSinceSunriseStart = CurrentTimeInMinutes - SunriseStartInMinutes;
+	CurrentMinutesSinceSunriseMidway = CurrentTimeInMinutes - SunriseMidwayInMinutes;
+	CurrentMinutesSinceSunriseEnd = CurrentTimeInMinutes - SunriseEndInMinutes;
+	
+	CurrentMinutesSinceSunPeak = CurrentTimeInMinutes - SunpeakInMinutes;
+	
+	CurrentMinutesSinceSunsetStart = CurrentTimeInMinutes - SunsetStartInMinutes;
+	CurrentMinutesSinceSunsetMidway = CurrentTimeInMinutes - SunsetMidwayInMinutes;
+	CurrentMinutesSinceSunsetEnd = CurrentTimeInMinutes - SunsetEndInMinutes;
 
-		//Its morning
-		if (MorningTimeStartInMinutes <= CurrentTimeInMinutes && CurrentTimeInMinutes <= MiddayTimeStartInMinutes)
-		{
-			//Here I need to know how often the timer has ticked since sunrize to then multiply it by the angle to add.
-			SunLocationZ = SunRisingPosition + (AngleToAddOnZ * (((CurrentMinutesSinceSunrise * SecondsPerHour) / 60) / TimeUpdatesInterval));
-			SunLocationY = SunPositionLowestPoint + (AngleToAddOnY * (((CurrentMinutesSinceSunrise * SecondsPerHour) / 60) / TimeUpdatesInterval));
+	CurrentMinutesSinceMoonSetStart= CurrentTimeInMinutes - MoonSetStartInMinutes;
+	CurrentMinutesSinceMoonRiseEnd = CurrentTimeInMinutes - MoonRiseEndInMinutes;
 
-			UE_LOG(LogTemp, Error, TEXT("It's Morning! Y:%f Z: %f"), CurrentMinutesSinceSunrise, AngleToAddOnZ);
-			bSunGoesDone = false;
-		}
-		//Its midday
-		else if (MiddayTimeStartInMinutes <= CurrentTimeInMinutes && CurrentTimeInMinutes <= DayTimeEndsInMinutes)
-		{
-			SunLocationZ = SunRisingPosition + (AngleToAddOnZ * (((CurrentMinutesSinceSunrise * SecondsPerHour) / 60) / TimeUpdatesInterval));
-			SunLocationY = SunPositionHighestPoint - (AngleToAddOnY * (((CurrentMinutesSinceMidday * SecondsPerHour) / 60) / TimeUpdatesInterval));
-
-			UE_LOG(LogTemp, Error, TEXT("Its midday, Y:%f Z: %f SunPositionHighestPoint: %f, AngleToAddOnY: %f, CurrentMinutesSinceMidday: %f"), SunLocationY, SunLocationZ, SunPositionHighestPoint, AngleToAddOnY, CurrentMinutesSinceMidday);
-			bSunGoesDone = true;
-		}
-		
-		//Its Sunrise
-		else if ((MorningTimeStartInMinutes - 60) <= CurrentTimeInMinutes && CurrentTimeInMinutes <= MorningTimeStartInMinutes)
-		{
-			UE_LOG(LogTemp, Error, TEXT("Its Sunrise, Y:%f Z: %f"), SunLocationY, SunLocationZ);
-			SunLocationZ = 0.0f;
-			SunLocationY = 0.0f;
-		}
-		
-		//Its Sunset
-		else if (DayTimeEndsInMinutes <= CurrentTimeInMinutes && CurrentTimeInMinutes <= (DayTimeEndsInMinutes + 60))
-		{
-			UE_LOG(LogTemp, Error, TEXT("Its Sunset, Y:%f Z: %f"), SunLocationY, SunLocationZ);
-			SunLocationZ = 0.0f;
-			SunLocationY = 0.0f;
-		}
-		else
-		{
-			//Its night
-			UE_LOG(LogTemp, Error, TEXT("Its night, Y:%f Z: %f"), SunLocationY, SunLocationZ);
-			SunLocationZ = 0.0f;
-			SunLocationY = 0.0f;
-		}
-		
-		
-		bSunSetToCurrentTime = true;
-
-	/*
-
-
-	//Check what time it is, and where the sun should be.
-
-	//How many angle to add should have been added. AngleToAddOnY * ? = Wanted result
-	//? = How many ticks there have been
-
-	//If the sun has been set correctly, just add to it. 
-	if(bSunSetToCurrentTime)
+	//////
+	// The following code handles the sunlight(directional light), aka moon, location in the sky
+	//////
+	
+	//Its morning
+	if (SunriseStartInMinutes <= CurrentTimeInMinutes && CurrentTimeInMinutes <= SunpeakInMinutes)
 	{
-		SunLocationZ = SunLocationZ + AngleToAddOnZ;
+		SunLocationZ = SunRisingPosition + (DayAngleToAddOnZ * (((CurrentMinutesSinceSunriseStart * SecondsPerHour) / 60) / TimeUpdatesInterval));
+		SunLocationY = SunPositionLowestPoint + (DayAngleToAddOnY * (((CurrentMinutesSinceSunriseStart * SecondsPerHour) / 60) / TimeUpdatesInterval));
 
 	}
+	//Its midday
+	else if (SunpeakInMinutes <= CurrentTimeInMinutes && CurrentTimeInMinutes <= SunsetEndInMinutes)
+	{
+		SunLocationZ = SunRisingPosition + (DayAngleToAddOnZ * (((CurrentMinutesSinceSunriseStart * SecondsPerHour) / 60) / TimeUpdatesInterval));
+		SunLocationY = SunPositionHighestPoint - (DayAngleToAddOnY * (((CurrentMinutesSinceSunPeak * SecondsPerHour) / 60) / TimeUpdatesInterval));
+	}
+	//Its night
 	else
 	{
-	
-
-	}
-	
-	if(bIsDayTime)
-	{
-		
-
-		if(bSunGoesDone)
-		{
-			SunLocationY = SunLocationY - AngleToAddOnY;
-		}
-		else
-		{
-			SunLocationY = SunLocationY + AngleToAddOnY;
-		}
-	}
-	else
-	{
-		//This is not oke
-		SunLocationZ = SunRisingPosition + AngleToAddOnZ;
-		SunLocationY = SunPositionLowestPoint + AngleToAddOnY;
-		bIsDayTime = true;
+		SunLocationZ = MoonStartLocation + (NightAngleToAddOnZ * (((CurrentMinutesSinceSunsetEnd * SecondsPerHour) / 60) / TimeUpdatesInterval));
+		SunLocationY = SunPositionHighestPoint;
 	}
 
-	//Check if day ended.
-	if (SunLocationY >= SunPositionHighestPoint)
-	{
-		bSunGoesDone = true;
-	}
-	else if(SunLocationY <= SunPositionLowestPoint)
-	{
-		bSunGoesDone = false;
-	}
-
-	if (SunLocationZ >= SunSettingPosition)
-	{
-		bIsDayTime = false;
-	}
-	*/
 	if(SunLigth)
 	{
 		SunLigth->SetActorRelativeRotation(FRotator(SunLocationY, SunLocationZ, 0.0f));
-	}	
+	}
+
+	//////
+	// The following code handles color and light,
+	//////
+
+	//Set day temperatures(Ignore the sun set and sunrise)
+	if (SunriseEndInMinutes <= CurrentTimeInMinutes && CurrentTimeInMinutes <= SunsetStartInMinutes)
+	{
+		SunAndMoonLightComponent->SetTemperature(TemperatureDay);
+		SunAndMoonLightComponent->SetIntensity(SunLumosity);
+		SunColor.R = 1.0f;
+		SunColor.G = 1.0f;
+		SunColor.B = 1.0f;
+		SunColor.A = 1.0f;
+		SunLigth->SetLightColor(SunColor);
+	}
+	//Set night temperatures(Ignore the moon set and moon rise)
+	else if(MoonRiseEndInMinutes <= CurrentTimeInMinutes || CurrentTimeInMinutes <= MoonSetStartInMinutes)
+	{
+		SunAndMoonLightComponent->SetTemperature(TemperatureNight);
+		SunAndMoonLightComponent->SetIntensity(MoonLumosity);
+		SunColor.R = .5f;
+		SunColor.G = .5f;
+		SunColor.B = 1.0f;
+		SunColor.A = 1.0f;
+		SunLigth->SetLightColor(SunColor);
+	}
+	//Moonsetting
+	else if(MoonSetStartInMinutes <= CurrentTimeInMinutes && CurrentTimeInMinutes <= SunriseStartInMinutes)
+	{
+		float NewIntensity = MoonLumosity - (LuminositiToAddBetweenNightAndGoldenHour * (((CurrentMinutesSinceMoonSetStart * SecondsPerHour) / 60) / TimeUpdatesInterval));
+		SunAndMoonLightComponent->SetIntensity(NewIntensity); 	
+		SunAndMoonLightComponent->SetTemperature(TemperatureNight);
+		SunColor.R = .5f;
+		SunColor.G = .5f;
+		SunColor.B = 1.0f;
+		SunColor.A = 1.0f;
+		SunLigth->SetLightColor(SunColor);
+
+	}
+	//Sunrise part 1
+	else if(SunriseStartInMinutes <= CurrentTimeInMinutes && CurrentTimeInMinutes <= SunriseMidwayInMinutes)
+	{
+		SunAndMoonLightComponent->SetTemperature(TemperatureGoldenhours);
+		SunColor.R = 1.0f;
+		SunColor.G = 1.0f;
+		SunColor.B = 1.0f;
+		SunColor.A = 1.0f;
+		SunLigth->SetLightColor(SunColor);
+		float NewIntensity = 0.0f + (LuminositiToAddBetweenGoldenHourAndDay * (((CurrentMinutesSinceSunriseStart * SecondsPerHour) / 60) / TimeUpdatesInterval) * 2);
+		SunAndMoonLightComponent->SetIntensity(NewIntensity); 
+	}
+	//Sunrise part 2
+	else if(SunriseMidwayInMinutes <= CurrentTimeInMinutes && CurrentTimeInMinutes <= SunriseEndInMinutes)
+	{
+		SunAndMoonLightComponent->SetIntensity(SunLumosity);
+		SunColor.R = 1.0f;
+		SunColor.G = 1.0f;
+		SunColor.B = 1.0f;
+		SunColor.A = 1.0f;
+		SunLigth->SetLightColor(SunColor);
+		float NewTemperature = TemperatureGoldenhours + (TemperatureToAddBetweenGoldenHourAndDay * (((CurrentMinutesSinceSunriseMidway * SecondsPerHour) / 60) / TimeUpdatesInterval) * 2);
+		SunAndMoonLightComponent->SetTemperature(NewTemperature);
+	}
+	//Sunset part 1
+	else if(SunsetStartInMinutes <= CurrentTimeInMinutes && CurrentTimeInMinutes <= SunsetMidwayInMinutes)
+	{
+		SunAndMoonLightComponent->SetIntensity(SunLumosity);
+		SunColor.R = 1.0f;
+		SunColor.G = 1.0f;
+		SunColor.B = 1.0f;
+		SunColor.A = 1.0f;
+		SunLigth->SetLightColor(SunColor);
+		float NewTemperature = TemperatureDay - (TemperatureToAddBetweenDayAndGoldenHour * (((CurrentMinutesSinceSunsetStart * SecondsPerHour) / 60) / TimeUpdatesInterval) * 2);
+		SunAndMoonLightComponent->SetTemperature(NewTemperature);
+	}
+	//Sunset part 2
+	else if(SunsetMidwayInMinutes <= CurrentTimeInMinutes && CurrentTimeInMinutes <= SunsetEndInMinutes)
+	{
+		SunAndMoonLightComponent->SetTemperature(TemperatureGoldenhours);
+		SunColor.R = 1.0f;
+		SunColor.G = 1.0f;
+		SunColor.B = 1.0f;
+		SunColor.A = 1.0f;
+		SunLigth->SetLightColor(SunColor);
+		float NewIntensity = SunLumosity - (LuminositiToAddBetweenDayAndGoldenHour * (((CurrentMinutesSinceSunsetMidway * SecondsPerHour) / 60) / TimeUpdatesInterval) * 2);
+		SunAndMoonLightComponent->SetIntensity(NewIntensity); 
+	}
+	//Moonrising
+	else if(SunsetEndInMinutes <= CurrentTimeInMinutes && CurrentTimeInMinutes <= MoonRiseEndInMinutes)
+	{
+		SunColor.R = .5f;
+		SunColor.G = .5f;
+		SunColor.B = 1.0f;
+		SunColor.A = 1.0f;
+		SunLigth->SetLightColor(SunColor);
+		float NewIntensity = 0.0f + (LuminositiToAddBetweenGoldenHourAndNight * (((CurrentMinutesSinceSunsetEnd * SecondsPerHour) / 60) / TimeUpdatesInterval));
+		SunAndMoonLightComponent->SetIntensity(NewIntensity); 	
+		SunAndMoonLightComponent->SetTemperature(TemperatureNight);
+	}
 }
+
+//		UE_LOG(LogTemp, Error, TEXT("Moonrising, Time: %f:%f | Temp(%f) | Lumos(%f)"), CurrentTimeHours, CurrentTimeMinutes, SunAndMoonLightComponent->Temperature, SunLigth->GetBrightness());
+
