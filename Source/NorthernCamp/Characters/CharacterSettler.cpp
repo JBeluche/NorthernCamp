@@ -2,4 +2,16 @@
 
 
 #include "NorthernCamp/Characters/CharacterSettler.h"
+#include "NorthernCamp/CharacterComponents/VitalsComponent.h"
 
+
+ACharacterSettler::ACharacterSettler()
+{
+	VitalsComponent = CreateDefaultSubobject<UVitalsComponent>(TEXT("Vitals Component"));
+
+}
+
+UVitalsComponent* ACharacterSettler::GetCharacterVitalsComponent()
+{
+	return VitalsComponent;
+}

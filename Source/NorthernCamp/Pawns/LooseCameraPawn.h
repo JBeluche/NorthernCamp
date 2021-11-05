@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "Landscape.h"
 #include "GameFramework/Pawn.h"
 #include "LooseCameraPawn.generated.h"
 class UBoxComponent;
@@ -49,5 +51,6 @@ public:
 
 	FVector2D PreviousTouchLocation;
 	FVector2D NewTouchLocation;
+
 
 };

@@ -230,3 +230,5 @@ void ADayNightActorController::MoveTime()
 
 //		UE_LOG(LogTemp, Error, TEXT("Moonrising, Time: %f:%f | Temp(%f) | Lumos(%f)"), CurrentTimeHours, CurrentTimeMinutes, SunAndMoonLightComponent->Temperature, SunLigth->GetBrightness());
 
+
+

@@ -5,8 +5,12 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
+#include "NorthernCamp/NorthernCampPlayerController.h"
+
 #include "SettlerInfoUserWidget.generated.h"
 
+class UVitalsComponent;
+class UProgressBar;
 class ACharacterSettler;
 class UScrollBox;
 class UButton;
@@ -16,18 +20,52 @@ class NORTHERNCAMP_API USettlerInfoUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+private:
+	virtual bool Initialize();
+
+	void UpdateInfoSettler();
+
+	FTimerHandle UpdateInfoSettlerTimerHandle;
+	ACharacterSettler* Settler;
+
+	UVitalsComponent* CharacterVitalsComponent;
+	
+	ANorthernCampPlayerController* PlayerController;
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* B_BackButton;
+
+	UFUNCTION()
+	void ExitInfoPanel();
+
 public:
-	virtual void NativeConstruct() override;
+	//virtual void NativeConstruct() override;
 
+	//Basic information settler
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* TB_SettlersName;
+
+	//Vitals settler
+	UPROPERTY(meta = (BindWidget))
+	UProgressBar* PB_HealthMeter;
 	
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* TB_SettlersName;
+	UProgressBar* PB_WaterMeter;
 
 	UPROPERTY(meta = (BindWidget))
-	class UScrollBox* ScrollboxWholeWindow;
-	
+	UProgressBar* PB_FoodMeter;
+
 	UPROPERTY(meta = (BindWidget))
-	class UButton* BackButton;
+	UProgressBar* PB_SleepMeter;
+
+	UPROPERTY(meta = (BindWidget))
+	UProgressBar* PB_FunFireMeter;
+
+	//Main functions widget
+	UPROPERTY(meta = (BindWidget))
+	UScrollBox* ScrollboxWholeWindow;
+	
+
 	
 
 };

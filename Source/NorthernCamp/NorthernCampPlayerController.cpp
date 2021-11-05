@@ -4,16 +4,19 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
-//#include "ArenCharacter.h"
 #include "NorthernCamp/UserWidgets/SettlerInfoUserWidget.h"
 #include "Blueprint/UserWidget.h"
-//#include "NorthernCamp/Pawns/CampPawn.h"
 #include "NorthernCamp/Pawns/LooseCameraPawn.h"
+#include "NorthernCamp/Pawns/CampCameraPawn.h"
 #include "NorthernCamp/Characters/CharacterHero.h"
 #include "NorthernCamp/Characters/CharacterSettler.h"
-#include "EngineUtils.h"
 #include "Math/UnrealMathUtility.h"
 #include "Components/ScrollBox.h"
+ 	
+
+#include "Engine/World.h"
+#include "EngineUtils.h"
+#include "NavigationSystem.h"
 
 
 ///////
@@ -28,15 +31,17 @@ ANorthernCampPlayerController::ANorthernCampPlayerController()
 
 	const ConstructorHelpers::FClassFinder<UUserWidget> WBPControlsLooseCamera(TEXT("/Game/Blueprints/UserWidgets/WBP_LooseCameraMain"));
 	const ConstructorHelpers::FClassFinder<UUserWidget> WBPSettlersInfoUserWidget(TEXT("/Game/Blueprints/UserWidgets/WBP_SettlerInfo"));
-	//ConstructorHelpers::FClassFinder<UUserWidget> WBPControlsCamp(TEXT("/Game/Blueprints/Widgets/WBP_ControlsCamp"));
+	ConstructorHelpers::FClassFinder<UUserWidget> WBPControlsCamp(TEXT("/Game/Blueprints/UserWidgets/WBP_CampCameraControls"));
 	//ConstructorHelpers::FClassFinder<UUserWidget> DialogWidgetClass(TEXT("/Game/Blueprints/Widgets/WBP_Dialog"));
 
+	
+	
 	LooseCameraUserWidget = WBPControlsLooseCamera.Class;
 	SettlerInfoUserWidget = WBPSettlersInfoUserWidget.Class;
-	//CampControlClass = WBPControlsCamp.Class;
+	CampControlClass = WBPControlsCamp.Class;
 	//DialogWidget = DialogWidgetClass.Class;
 
-	//CampPawn = nullptr;
+	CampCameraPawn = nullptr;
 	LooseCameraPawn = nullptr;
 	SelectedHero = nullptr;
 	SelectedSettler = nullptr;
@@ -46,22 +51,11 @@ ANorthernCampPlayerController::ANorthernCampPlayerController()
 
 void ANorthernCampPlayerController::BeginPlay()
 {
-	//Seting playable pawns.
-	/*for (TActorIterator<ACampPawn> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-	{
-		CampPawn = *ActorItr;
-	}*/
-	for (TActorIterator<ALooseCameraPawn> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-	{
-		LooseCameraPawn = *ActorItr;
-	}
 
 	SetSelectedHero(EHero::Will);
 
-	CurrentPawnEnum = ECurrentPawn::ArenCharacter;
-	SetNewOwner();
-
 	FingerTouchDuration = 0.0f;
+	
 	//Command to make the shadows appear for longer distances.
 	GEngine->Exec( GetWorld(), TEXT( "r.Shadow.RadiusThreshold 0.01" ) );
 	GEngine->Exec( GetWorld(), TEXT( "stat fps" ) );
@@ -72,13 +66,11 @@ void ANorthernCampPlayerController::PlayerTick(float DeltaTime)
 
 	Super::PlayerTick(DeltaTime);
 
-	//Easy way to measure time.
+	//Easy way to measure amount of ticks.
 	Time = Time + 1.0f;
-	
-	
 
-
-	KeepCameraInHeroBounds(DeltaTime);
+	if(CurrentPawnEnum == ECurrentPawn::LooseCamera){KeepCameraInHeroBounds(DeltaTime);}
+	
 	if(!bCameraIsMoving)
 	{
 		GetInputTouchState(ETouchIndex::Touch1, NewTouchLocation.X, NewTouchLocation.Y, bIsFingerTouching);
@@ -88,92 +80,54 @@ void ANorthernCampPlayerController::PlayerTick(float DeltaTime)
 
 void ANorthernCampPlayerController::SetupInputComponent()
 {
-	// set up gameplay key bindings
 	Super::SetupInputComponent();
-
-	Controls = CreateWidget<UUserWidget>(this, LooseCameraUserWidget, FName("Main Loose Camera Controls"));
-	Controls->AddToViewport();
+	SwitchPawn(ECurrentPawn::LooseCamera);
 }
-/*
+
 void ANorthernCampPlayerController::SwitchPawn(ECurrentPawn NewPawn)
 {
 	CurrentPawnEnum = NewPawn;
-	if(Controls){Controls->RemoveFromViewport();}
-		
+
+	if(LooseCameraPawn != nullptr || CampCameraPawn != nullptr)
+	{
 		UnPossess();
-	
-
-	if (CurrentPawnEnum == ECurrentPawn::ARENCHARACTER)
-	{
-		Possess(MainPlayerPawn);
-		SetOwner();
-		//Get the player charater on the map and focus camera
-
-		Controls = CreateWidget<UUserWidget>(this, CharacterControlClass, FName("Character Controls"));
-		Controls->AddToViewport();
-
-	}
-	else if (CurrentPawnEnum == ECurrentPawn::CAMP)
-	{
-		Possess(CampPawn);
-		SetOwner();
-
-		Controls = CreateWidget<UUserWidget>(this, CampControlClass, FName("Camp Controls"));
-		Controls->AddToViewport();
-
-	}
-	else if(CurrentPawnEnum == ECurrentPawn::DIALOG)
-	{
-
-		Possess(MainPlayerPawn);
-		SetOwner();
-		UE_LOG(LogTemp, Error, TEXT("Dialog is set"));
-
 	}
 
-
-}*/
+	if (CurrentPawnEnum == ECurrentPawn::LooseCamera)
+	{
+		for (TActorIterator<ALooseCameraPawn> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+		{
+			LooseCameraPawn = *ActorItr;
+		}
+		if(LooseCameraPawn != nullptr)
+		{
+			Possess(LooseCameraPawn);
+			UpdateUI(ECurrentUI::LooseCamera);
+			SetNewOwner();	
+		}
+	}
+	else if (CurrentPawnEnum == ECurrentPawn::Camp)
+	{
+		for (TActorIterator<ACampCameraPawn> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+		{
+			CampCameraPawn = *ActorItr;
+		}
+		if(CampCameraPawn != nullptr)
+		{
+			Possess(CampCameraPawn);
+			UpdateUI(ECurrentUI::Camp);
+			SetNewOwner();
+		}
+	}
+}
 
 void ANorthernCampPlayerController::SetNewOwner()
 {
 	MyOwner = Cast<AActor>(GetPawn());
 }
-/*
-UUserWidget* ANorthernCampPlayerController::GetDialogWidget()
-{
-	return CreateWidget<UUserWidget>(this, DialogWidget, FName("Dialog Controls"));
-}*/
 
 void ANorthernCampPlayerController::FingerTouchHandler(float DeltaTime)
 {
-
-	/*if (CurrentPawnEnum == ECurrentPawn::CAMP)
-	{
-	GetInputTouchState(ETouchIndex::Touch1, NewTouchLocation.X, NewTouchLocation.Y, bIsFingerTouching);
-	if (bIsFingerTouching)
-	{
-	if (MyOwner)
-	{
-	float NewRotation = PreviousTouchLocation.X - NewTouchLocation.X;
-
-	FRotator CurrentRotation = MyOwner->GetActorRotation();
-
-	if (PreviousTouchLocation.X == 0.0f)
-	{
-	NewRotation = 0.0f;
-	}
-
-	MyOwner->SetActorRotation(FRotator(CurrentRotation.Pitch, (CurrentRotation.Yaw + NewRotation), CurrentRotation.Roll));
-	}
-	PreviousTouchLocation = NewTouchLocation;
-	}
-	else
-	{
-	PreviousTouchLocation.X = 0.0f;
-	}
-	}
-	else if (CurrentPawnEnum == ECurrentPawn::Hero)
-	{*/
 
 	//What to do if the finger is touching the screen
 	if (bIsFingerTouching)
@@ -207,9 +161,6 @@ void ANorthernCampPlayerController::FingerTouchHandler(float DeltaTime)
 		PreviousTouchLocation.Y = 0.0f;
 		FingerTouchDuration = 0.0f;
 
-	
-	
-
 
 	}
 }
@@ -219,22 +170,34 @@ void ANorthernCampPlayerController::SelectSettlerCondition()
 	//If there is no war the only thing to do is display the information. 
 	if (FingerTouchDuration < 50.0f && FingerTouchDuration > 2.0f && Cast<ACharacterSettler>(LastTouchHitResults.Actor))
 	{
-		SelectedSettler = Cast<ACharacterSettler>(LastTouchHitResults.Actor);
-
-		UpdateUI(ECurrentUI::SettlersInfo);
+		if(CurrentPawnEnum == ECurrentPawn::LooseCamera)
+		{
+			SelectedSettler = Cast<ACharacterSettler>(LastTouchHitResults.Actor);
+			UpdateUI(ECurrentUI::SettlerInfo);
+		}
 	}
 }
 
 void ANorthernCampPlayerController::UpdateUI(ECurrentUI NewCurrentUI)
 {
 	if(Controls){Controls->RemoveFromViewport();}
-	if(NewCurrentUI == ECurrentUI::SettlersInfo)
+	bIsInMenu = false;
+	CurrentScrollBar = nullptr;
+	if(NewCurrentUI == ECurrentUI::SettlerInfo)
 	{
 		Controls = CreateWidget<UUserWidget>(this, SettlerInfoUserWidget, FName("Settler Information Widget"));
-		
 		CurrentScrollBar = Cast<UScrollBox>(Cast<USettlerInfoUserWidget>(Controls)->ScrollboxWholeWindow);
 		bIsInMenu = true;
 	}
+	else if(NewCurrentUI == ECurrentUI::LooseCamera)
+	{
+		Controls = CreateWidget<UUserWidget>(this, LooseCameraUserWidget, FName("Main Loose Camera Controls"));
+	}
+	else if(NewCurrentUI == ECurrentUI::Camp)
+	{
+		Controls = CreateWidget<UUserWidget>(this, CampControlClass, FName("Camp Controls"));
+	}
+	
 	Controls->AddToViewport();
 }
 
@@ -251,10 +214,18 @@ void ANorthernCampPlayerController::DoubleTapTouchCondition()
 	{
 		FingerTapAmount = 0;
 	}
+	//Check if it hit something interesting.
+	if(FingerTapAmount == 1)
+	{
+		
+	}
 	if(FingerTapAmount == 2)
 	{
 		FingerTapAmount = 0;
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(SelectedHero->GetController(), LastTouchHitResults.Location);
+		if(CurrentPawnEnum == ECurrentPawn::LooseCamera)
+		{
+			if(SelectedHero != nullptr)  {UAIBlueprintHelperLibrary::SimpleMoveToLocation(SelectedHero->GetController(), LastTouchHitResults.Location);}
+		}
 	}
 }
 
@@ -285,21 +256,32 @@ void ANorthernCampPlayerController::MoveCameraAccordingToFinger()
 		if(bIsInMenu)
 		{
 			CurrentScrollBar->SetScrollOffset(FloatToAddOnY);
-			UE_LOG(LogTemp, Error, TEXT("Offset to add = %f"), FloatToAddOnY);
-
 		}
-		else
+		else if(CurrentPawnEnum == ECurrentPawn::LooseCamera)
 		{
 			MyOwner->SetActorLocation(NewLocation);
 		}
-			
-		//Look at how much the difference was to make a sort of speed when the finger is released
+		else if(CurrentPawnEnum == ECurrentPawn::Camp)
+		{
+			float NewRotation = PreviousTouchLocation.X - NewTouchLocation.X;
+
+			FRotator CurrentRotation = MyOwner->GetActorRotation();
+
+			if (PreviousTouchLocation.X == 0.0f)
+			{
+				NewRotation = 0.0f;
+			}
+
+			MyOwner->SetActorRotation(FRotator(CurrentRotation.Pitch, (CurrentRotation.Yaw + NewRotation), CurrentRotation.Roll));
+		}
 		PreviousTouchLocation = NewTouchLocation;
 	}
 }
 
 void ANorthernCampPlayerController::KeepCameraInHeroBounds(float DeltaTime)
 {
+	if(SelectedHero == nullptr){return;}
+	if(MyOwner == nullptr){return;}
 	//Get distance, set the the position to go to. 
 	FVector CurrentLocation = MyOwner->GetActorLocation();
 	FVector HeroLocationXY = FVector(SelectedHero->GetActorLocation().X, SelectedHero->GetActorLocation().Y, MyOwner->GetActorLocation().Z);
@@ -326,15 +308,36 @@ void ANorthernCampPlayerController::SetSelectedHero(EHero CharacterHeroEnum)
 	for (TActorIterator<ACharacterHero> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
 		ACharacterHero *HeroToCheck = Cast<ACharacterHero>(*ActorItr);
-		
+	
 		if(HeroToCheck->HeroEnum == CharacterHeroEnum)
 		{
 			SelectedHero = *ActorItr;
-			UE_LOG(LogTemp, Warning, TEXT("Setting hero again"));
 
+			const FVector& PathStart = SelectedHero->GetActorLocation();
+			const FVector& PathEnd = FVector(-2280.0f, -13620.0f, 1060.0f);
+			float OutPathLength;
+
+			//////
+			//I was trying out to figure out some distances here. Should be cleaned up
+			///
+			
+			NavigationSystemv1 = Cast<UNavigationSystemV1>(UNavigationSystemV1::GetCurrent(GetWorld()));
+
+			if(NavigationSystemv1)
+			{
+				NavigationSystemv1->GetPathLength(PathStart, PathEnd, OutPathLength);
+			}
+
+	
+	
 			return;
 		}
 	}
+
+
+
+	
+
 }
 
 

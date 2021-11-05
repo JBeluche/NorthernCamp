@@ -4,7 +4,6 @@
 #include "NorthernCamp/Pawns/LooseCameraPawn.h"
 #include "Components/BoxComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Landscape.h"
 #include "GameFramework/SpringArmComponent.h"
 
 ALooseCameraPawn::ALooseCameraPawn()
@@ -27,6 +26,11 @@ ALooseCameraPawn::ALooseCameraPawn()
 void ALooseCameraPawn::BeginPlay()
 {
 	Super::BeginPlay();
+
+	CameraBoom->bDoCollisionTest = false;
+	if(CameraHeight < 1000.0f){CameraHeight = 1000.0f;}
+
+	
 }
 
 // Called every frame
@@ -47,8 +51,10 @@ void ALooseCameraPawn::SetupPlayerInputComponent(UInputComponent *PlayerInputCom
 //FIXME Execute this function only when the finger is swipping and or in a timer. Not when ticking.
 void ALooseCameraPawn::SetPositionRelativeToLandscape()
 {
-	TArray<FHitResult> OutHits;
-	
+
+	TArray<FHitResult> HitResult;
+	FCollisionResponseParams ResponseParam;
+
 	FVector StartLocation = GetActorLocation();
 	FVector EndLocation = FVector(StartLocation.X, StartLocation.Y, (StartLocation.Z - 10000.0f));
 
@@ -56,21 +62,24 @@ void ALooseCameraPawn::SetPositionRelativeToLandscape()
 	RV_TraceParams.bTraceComplex = true;
 	RV_TraceParams.bReturnPhysicalMaterial = false;
 	
-	FHitResult RV_Hit(ForceInit);
 		
-	GetWorld()->LineTraceSingleByChannel(
-		RV_Hit,        		//result
+	GetWorld()->LineTraceMultiByChannel(
+		OUT HitResult,        		//result
 		StartLocation,   	//start
 		EndLocation, 		//end
-		ECC_Pawn, 			//collision channel
-		RV_TraceParams
+		ECollisionChannel::ECC_GameTraceChannel1, //collision channel 
+		RV_TraceParams,
+		ResponseParam
 	);
 
-	if(RV_Hit.bBlockingHit)
+	for(FHitResult& Result : HitResult)
 	{
-		if(Cast<ALandscape>(RV_Hit.Actor))
+		if(AActor* HitActor = Result.GetActor())
 		{
-			SetActorLocation(FVector(StartLocation.X, StartLocation.Y, (RV_Hit.ImpactPoint.Z + CameraHeight)));
+			if(Cast<ALandscape>(Result.Actor))
+			{
+				SetActorLocation(FVector(StartLocation.X, StartLocation.Y, (Result.ImpactPoint.Z + CameraHeight)));
+			}
 		}
 	}
 }

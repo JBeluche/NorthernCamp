@@ -7,7 +7,8 @@
 #include "NorthernCamp/Characters/CharacterHero.h"
 
 #include "NorthernCampPlayerController.generated.h"
-//Classes
+class UNavigationSystemV1;
+class ACampCameraPawn;
 class UUserWidget;
 class ALooseCameraPawn;
 class ACharacterBase;
@@ -18,7 +19,7 @@ class UScrollBox;
 UENUM(BlueprintType)
 enum class ECurrentPawn : uint8 
 {
-	ArenCharacter UMETA(DisplayName = "Aren Character"),
+	LooseCamera UMETA(DisplayName = "Aren Character"),
 	Camp UMETA(DisplayName = "Camp"),
 	
 };
@@ -26,7 +27,9 @@ enum class ECurrentPawn : uint8
 UENUM(BlueprintType)
 enum class ECurrentUI : uint8 
 {
-	SettlersInfo UMETA(DisplayName = "Information Settler"),
+	SettlerInfo UMETA(DisplayName = "Information Settler"),
+	LooseCamera UMETA(DisplayName = "Loose Camera"),
+	Camp UMETA(DisplayName = "Camp UI"),
 };
 
 UCLASS()
@@ -43,10 +46,12 @@ public:
 	ECurrentPawn CurrentPawnEnum;
 
 	UUserWidget* GetDialogWidget();
+	
 	void SetSelectedHero(EHero CharacterHeroEnum);
 
 	
 	ACharacterSettler* SelectedSettler;
+	void UpdateUI(ECurrentUI NewCurrentUI);
 
 
 protected:
@@ -61,7 +66,7 @@ protected:
 
 private:
 
-	//Varaibles C++
+	//Varaibles 
 	TSubclassOf<class UUserWidget> LooseCameraUserWidget;
 	TSubclassOf<class UUserWidget> CampControlClass;
 	TSubclassOf<class UUserWidget> DialogWidget;
@@ -69,14 +74,14 @@ private:
 	
 	UUserWidget* Controls;
 	AActor* MyOwner;
-	
-	//AArenCharacter* ControlledCharater;
 
-	//Varialbes Blueprint
-	//ACampPawn* CampPawn;
+	UPROPERTY()
+	UNavigationSystemV1*  NavigationSystemv1;
+
+	ACampCameraPawn* CampCameraPawn;
 	ALooseCameraPawn* LooseCameraPawn;
 	ACharacterHero* SelectedHero;
-
+	ACharacterHero* TouchedHero;
 
 	FVector2D PreviousTouchLocation;
 	FVector2D NewTouchLocation;
@@ -107,7 +112,6 @@ private:
 	void MoveCameraAccordingToFinger();
 	void KeepCameraInHeroBounds(float DeltaTime);
 	void SelectSettlerCondition();
-	void UpdateUI(ECurrentUI NewCurrentUI);
 
 	void FingerTouchHandler(float DeltaTime);
 

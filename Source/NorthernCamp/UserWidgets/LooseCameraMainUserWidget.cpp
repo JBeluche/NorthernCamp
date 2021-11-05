@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "NorthernCamp/Characters/CharacterHero.h"
 #include "NorthernCamp/Controllers/DayNightActorController.h"
+#include "Engine/World.h"
 
 bool ULooseCameraMainUserWidget::Initialize()
 {
@@ -24,7 +25,14 @@ bool ULooseCameraMainUserWidget::Initialize()
 	if (!ensure(ButtonTrader != nullptr)) return false;
 	ButtonTrader->OnClicked.AddDynamic(this, &ULooseCameraMainUserWidget::SwitchToTrader);
 
-	PlayerController = Cast<ANorthernCampPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		
+	for (FConstPlayerControllerIterator iter = GetWorld()->GetPlayerControllerIterator(); iter; ++iter)
+	{
+		APlayerController* PlayerControllerIterating = Cast<APlayerController>(*iter);
+
+		PlayerController = Cast<ANorthernCampPlayerController>(PlayerControllerIterating);
+
+	}
 
 	for (TActorIterator<ADayNightActorController> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
@@ -56,7 +64,7 @@ void ULooseCameraMainUserWidget::SetClock()
 }
 void ULooseCameraMainUserWidget::SwitchToCamp()
 {
-	//PlayerController->SwitchPawn(PlayerController->ECurrentPawn::CAMP);
+	PlayerController->SwitchPawn(ECurrentPawn::Camp);
 }
 
 

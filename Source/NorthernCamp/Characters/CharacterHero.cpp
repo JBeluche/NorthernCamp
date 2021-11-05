@@ -3,3 +3,8 @@
 
 #include "NorthernCamp/Characters/CharacterHero.h"
 
+ACharacterHero::ACharacterHero()
+{
+	bIsHero = true;
+}
+

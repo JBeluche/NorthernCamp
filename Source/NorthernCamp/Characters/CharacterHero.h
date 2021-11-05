@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CharacterBase.h"
+#include "CharacterSettler.h"
 #include "CharacterHero.generated.h"
 
 
@@ -23,7 +23,7 @@ enum class EHero : uint8
 
 
 UCLASS()
-class NORTHERNCAMP_API ACharacterHero : public ACharacterBase
+class NORTHERNCAMP_API ACharacterHero : public ACharacterSettler
 {
 	GENERATED_BODY()
 
@@ -31,4 +31,6 @@ class NORTHERNCAMP_API ACharacterHero : public ACharacterBase
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EHero HeroEnum;
+
+	ACharacterHero();
 };
