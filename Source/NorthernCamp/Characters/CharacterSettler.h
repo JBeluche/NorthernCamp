@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CharacterBase.h"
+#include "Components/SphereComponent.h"
 
 #include "CharacterSettler.generated.h"
 
@@ -20,11 +21,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText Name;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (AllowPrivateAccess = "true"))
 	UVitalsComponent* VitalsComponent;
 
 	UVitalsComponent* GetCharacterVitalsComponent();
 
 	bool bIsHero = false;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (AllowPrivateAccess = "true"))
+	float ActionRange = 100.0f;
+
+	void Drink();
 };

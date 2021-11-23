@@ -3,8 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
 #include "BuildingBaseActor.generated.h"
+
+
+enum class EResourceType : uint8 
+{
+	Water UMETA(DisplayName = "Water"),
+	Food UMETA(DisplayName = "Food"),
+	
+};
+
 
 UCLASS()
 class NORTHERNCAMP_API ABuildingBaseActor : public AActor
@@ -20,7 +31,16 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
+	TMap<EResourceType, int32> ResourcesStoredInBuilding;
+	TMap<EResourceType, int32> BuildingCost;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	int32 StartingWater;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	USphereComponent* BuildingActionRadius;
+
+	bool ExtractRersouce(EResourceType ResourceType, int32 Amount);
+	bool CheckResourceAvailability(EResourceType ResourceType, int32 Amount);
 };

@@ -15,3 +15,11 @@ UVitalsComponent* ACharacterSettler::GetCharacterVitalsComponent()
 {
 	return VitalsComponent;
 }
+
+void ACharacterSettler::Drink()
+{
+
+	UE_LOG(LogTemp, Error, TEXT("Hi, i am not happy"));
+	
+	//VitalsComponent->CurrentWaterMeter = 100.f;
+}

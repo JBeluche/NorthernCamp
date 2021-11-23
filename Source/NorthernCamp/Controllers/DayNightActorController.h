@@ -6,6 +6,10 @@
 #include "GameFramework/Actor.h"
 #include "DayNightActorController.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAnHourStruck, float, CurrentHour);
+
+
 class ADirectionalLight;
 
 
@@ -23,7 +27,10 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	
+
+	UPROPERTY(BlueprintAssignable, Category="Hourly events")
+	FOnAnHourStruck AnHourStruck;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ADirectionalLight* SunLigth;
 

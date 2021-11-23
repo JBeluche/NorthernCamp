@@ -77,6 +77,7 @@ void ADayNightActorController::MoveTime()
 	if(CurrentTimeMinutes >= 60.0f)
 	{
 		CurrentTimeHours++;
+		AnHourStruck.Broadcast(CurrentTimeHours);
 		if(CurrentTimeHours >= 24.0f){CurrentTimeHours = 0.0f;}
 		//if(CurrentTimeMinutes > 60.0f){CurrentTimeMinutes = 60.0f / (SecondsPerHour / TimeUpdatesInterval);}
 		if(CurrentTimeMinutes >= 60.0f){CurrentTimeMinutes = CurrentTimeMinutes - 60.0f; }

@@ -32,5 +32,8 @@ public:
 	float CurrentThirst = 100.0f;
 	float CurrentHealth = 100.0f;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	float ActionRadius = 200.0f;
+
+	bool WithinActionRadius(AActor* Actor);
 };

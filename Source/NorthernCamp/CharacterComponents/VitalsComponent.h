@@ -9,6 +9,7 @@
 #include "VitalsComponent.generated.h"
 
 
+class AAISettlerController;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class NORTHERNCAMP_API UVitalsComponent : public UActorComponent
 {
@@ -36,6 +37,11 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (AllowPrivateAccess = "true"))
 	float WaterPercentageDecreasePerHour;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Water Meter")
+	float WaterIsLowThreshold;
+
+
 	//////
 	// FOOD
 
@@ -80,7 +86,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	ADayNightActorController* DayNightController;
-
+	
+	ACharacter* Owner;
+	AAISettlerController* Controller;
 
 		
 };

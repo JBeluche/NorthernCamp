@@ -4,6 +4,8 @@
 #include "NorthernCamp/CharacterComponents/VitalsComponent.h"
 
 #include "EngineUtils.h"
+#include "GameFramework/Character.h"
+#include "NorthernCamp/AIController/AISettlerController.h"
 #include "NorthernCamp/Controllers/DayNightActorController.h"
 
 // Sets default values for this component's properties
@@ -33,6 +35,9 @@ void UVitalsComponent::BeginPlay()
 	CurrentFoodMeter = 100.0f;
 	CurrentSleepMeter = 100.0f;
 	CurrentFunFireMeter = 100.0f;
+	
+	Owner = Cast<ACharacter>(GetOwner());
+	Controller = Cast<AAISettlerController>(Owner->GetController());
 
 	for (TActorIterator<ADayNightActorController> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
@@ -43,9 +48,13 @@ void UVitalsComponent::BeginPlay()
 
 void UVitalsComponent::UpdateVitals()
 {
-	//Get the rate
-	//Get how much time should elapse with the rate
-	//Subtract by looking at WaterPercentageDecreasePerHour
+
+
+	if(Controller == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("You have the wrong ai setup for a settler, he cant look for resources"));
+		return;
+	}
 
 	if(DayNightController)
 	{
@@ -53,6 +62,11 @@ void UVitalsComponent::UpdateVitals()
 		//////
 		// WATER
 		//////
+		if(CurrentWaterMeter < WaterIsLowThreshold)
+        			{
+        				Controller->WaterIsLow();
+        			}
+        			
 		if(CurrentWaterMeter <= 0.0f)
 		{
 			//You are dying 
@@ -62,6 +76,7 @@ void UVitalsComponent::UpdateVitals()
 		{
 			float WaterToSubtract =	(TimeIntervalVitalsCheck * WaterPercentageDecreasePerHour) / DayNightController->SecondsPerHour;
 			CurrentWaterMeter =  CurrentWaterMeter - WaterToSubtract;
+			
 
 		}
 	

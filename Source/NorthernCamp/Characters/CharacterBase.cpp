@@ -32,3 +32,15 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+bool ACharacterBase::WithinActionRadius(AActor* Actor)
+{
+	const float TempDistance = FVector::Dist(GetActorLocation(), Actor->GetActorLocation());
+
+	UE_LOG(LogTemp, Error, TEXT("The distance from the player is: %f and the radius is: %f"), TempDistance, ActionRadius);
+	if(TempDistance < ActionRadius)
+	{
+		return true;	
+	}
+
+	return false;
+}

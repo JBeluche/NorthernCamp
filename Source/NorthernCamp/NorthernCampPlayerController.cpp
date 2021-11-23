@@ -52,6 +52,7 @@ ANorthernCampPlayerController::ANorthernCampPlayerController()
 void ANorthernCampPlayerController::BeginPlay()
 {
 
+	SwitchPawn(ECurrentPawn::LooseCamera);
 	SetSelectedHero(EHero::Will);
 
 	FingerTouchDuration = 0.0f;
@@ -81,7 +82,6 @@ void ANorthernCampPlayerController::PlayerTick(float DeltaTime)
 void ANorthernCampPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-	SwitchPawn(ECurrentPawn::LooseCamera);
 }
 
 void ANorthernCampPlayerController::SwitchPawn(ECurrentPawn NewPawn)
@@ -221,10 +221,14 @@ void ANorthernCampPlayerController::DoubleTapTouchCondition()
 	}
 	if(FingerTapAmount == 2)
 	{
+	
 		FingerTapAmount = 0;
 		if(CurrentPawnEnum == ECurrentPawn::LooseCamera)
 		{
-			if(SelectedHero != nullptr)  {UAIBlueprintHelperLibrary::SimpleMoveToLocation(SelectedHero->GetController(), LastTouchHitResults.Location);}
+			if(SelectedHero != nullptr)
+			{
+				UAIBlueprintHelperLibrary::SimpleMoveToLocation(SelectedHero->GetController(), LastTouchHitResults.Location);
+			}
 		}
 	}
 }
@@ -288,7 +292,7 @@ void ANorthernCampPlayerController::KeepCameraInHeroBounds(float DeltaTime)
 
 	float DistanceFromCharacter = FVector(HeroLocationXY - CurrentLocation).Size();
 
-	if(DistanceFromCharacter > 2000.0f)
+	if(DistanceFromCharacter > SelectedHero->MaxCameraDistance)
 	{
 		MyOwner->SetActorLocation(FMath::Lerp(CurrentLocation, HeroLocationXY, (DeltaTime * 1)));
 		bCameraIsMoving = true;
@@ -312,23 +316,6 @@ void ANorthernCampPlayerController::SetSelectedHero(EHero CharacterHeroEnum)
 		if(HeroToCheck->HeroEnum == CharacterHeroEnum)
 		{
 			SelectedHero = *ActorItr;
-
-			const FVector& PathStart = SelectedHero->GetActorLocation();
-			const FVector& PathEnd = FVector(-2280.0f, -13620.0f, 1060.0f);
-			float OutPathLength;
-
-			//////
-			//I was trying out to figure out some distances here. Should be cleaned up
-			///
-			
-			NavigationSystemv1 = Cast<UNavigationSystemV1>(UNavigationSystemV1::GetCurrent(GetWorld()));
-
-			if(NavigationSystemv1)
-			{
-				NavigationSystemv1->GetPathLength(PathStart, PathEnd, OutPathLength);
-			}
-
-	
 	
 			return;
 		}
