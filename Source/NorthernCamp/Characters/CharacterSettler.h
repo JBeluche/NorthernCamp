@@ -5,9 +5,11 @@
 #include "CoreMinimal.h"
 #include "CharacterBase.h"
 #include "Components/SphereComponent.h"
+#include "NorthernCamp/Actors/BuildingBaseActor.h"
 
 #include "CharacterSettler.generated.h"
 
+enum class EResourceType : uint8;
 class UVitalsComponent;
 
 UCLASS()
@@ -31,5 +33,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (AllowPrivateAccess = "true"))
 	float ActionRange = 100.0f;
 
-	void Drink();
+	bool DrinkWater(float Amount);
+
+	bool CheckIfResourceInHand(EResourceType ResourceType, int32 Amount);
+	bool PutResourceInHand(EResourceType ResourceType, int32 Amount);
+	
+private:
+	//Can be item, resource or else?
+	EResourceType ResourceHandLeft = EResourceType::None;
+	EResourceType ResourceHandRight = EResourceType::None;;
+	int32 ResourceAmountHandRight = 0;
+	int32 ResourceAmountHandLeft = 0;
+
+	//Private functions
+	void DropResource();
 };

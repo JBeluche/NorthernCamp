@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/ResourceManagerComponent.h"
 
 #include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
@@ -11,6 +12,7 @@
 
 enum class EResourceType : uint8 
 {
+	None UMETA(DisplayName = "None"),
 	Water UMETA(DisplayName = "Water"),
 	Food UMETA(DisplayName = "Food"),
 	
@@ -43,4 +45,8 @@ public:
 
 	bool ExtractRersouce(EResourceType ResourceType, int32 Amount);
 	bool CheckResourceAvailability(EResourceType ResourceType, int32 Amount);
+
+	UResourceManagerComponent* ResourceManagerComp;
+
+	
 };

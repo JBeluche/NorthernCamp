@@ -2,12 +2,15 @@
 
 
 #include "NorthernCamp/Characters/CharacterSettler.h"
+
 #include "NorthernCamp/CharacterComponents/VitalsComponent.h"
 
 
 ACharacterSettler::ACharacterSettler()
 {
 	VitalsComponent = CreateDefaultSubobject<UVitalsComponent>(TEXT("Vitals Component"));
+
+	
 
 }
 
@@ -16,10 +19,50 @@ UVitalsComponent* ACharacterSettler::GetCharacterVitalsComponent()
 	return VitalsComponent;
 }
 
-void ACharacterSettler::Drink()
+bool ACharacterSettler::DrinkWater(float Amount)
 {
+	if(VitalsComponent)
+	{
+		VitalsComponent->CurrentWaterMeter = Amount;
+		return true;
+	}
 
-	UE_LOG(LogTemp, Error, TEXT("Hi, i am not happy"));
+	return false;
+}
+
+bool ACharacterSettler::CheckIfResourceInHand(EResourceType ResourceType, int32 Amount)
+{
+	if(ResourceType == ResourceHandLeft || ResourceType == ResourceHandRight)
+	{
+		if(Amount > ResourceAmountHandLeft || Amount > ResourceAmountHandRight)
+		{
+			return false;
+		}
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool ACharacterSettler::PutResourceInHand(EResourceType ResourceType, int32 Amount)
+{
+	if(CheckIfResourceInHand(ResourceType, Amount))
+	{
+		DropResource();
+	}
 	
-	//VitalsComponent->CurrentWaterMeter = 100.f;
+	ResourceHandRight = ResourceType;
+	ResourceAmountHandRight = Amount;
+
+	return true;
+}
+
+void ACharacterSettler::DropResource()
+{
+	ResourceHandLeft = EResourceType::None;
+	ResourceHandRight = EResourceType::None;
+	ResourceAmountHandRight = 0;
+	ResourceAmountHandLeft = 0;
 }

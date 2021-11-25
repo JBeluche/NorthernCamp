@@ -5,6 +5,7 @@
 
 #include "Components/BoxComponent.h"
 #include "NorthernCamp/Actors/BuildingBaseActor.h"
+#include "NorthernCamp/Characters/CharacterSettler.h"
 
 //////
 // FEATURES IDEAS
@@ -23,6 +24,7 @@ ACartBaseActor::ACartBaseActor()
 	MeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	MeshComp->SetupAttachment(SceneComponent);
 
+	ResourceManagerComp = CreateDefaultSubobject<UResourceManagerComponent>(TEXT("Resource Manager"));
 	
 	
 }
@@ -48,12 +50,12 @@ void ACartBaseActor::BeginPlay()
 
 bool ACartBaseActor::ExtractRersouce(EResourceType ResourceType, int32 Amount)
 {
-	for (const TPair<EResourceType, int32>& Pair : ResourcesStoredInCart)
+	for (TPair<EResourceType, int32>& Pair : ResourcesStoredInCart)
 	{
 		if(Pair.Key == ResourceType && Pair.Value >= Amount)
 		{
 			ResourcesStoredInCart.Emplace(Pair.Key, (Pair.Value - Amount));
-			UE_LOG(LogTemp, Warning, TEXT("Took water from the cart, current water: %i"), Pair.Value);
+			UE_LOG(LogTemp, Warning, TEXT("%s 's current water: %i"), *GetName(), Pair.Value);
 			
 			return true;
 		}
@@ -64,7 +66,7 @@ bool ACartBaseActor::ExtractRersouce(EResourceType ResourceType, int32 Amount)
 
 bool ACartBaseActor::CheckResourceAvailability(EResourceType ResourceType, int32 Amount)
 {
-	for (const TPair<EResourceType, int32>& Pair : ResourcesStoredInCart)
+	for (TPair<EResourceType, int32>& Pair : ResourcesStoredInCart)
 	{
 		if(Pair.Key == ResourceType && Pair.Value >= Amount)
 		{
@@ -75,20 +77,71 @@ bool ACartBaseActor::CheckResourceAvailability(EResourceType ResourceType, int32
 }
 
 //When almost at the cart location reserve the spot so other characters can look for another
-bool ACartBaseActor::ReservePickupSpot(AActor* ActorAskingForSpot)
+UBoxComponent* ACartBaseActor::ReservePickupSpot(ACharacterSettler* CharacterAskingForSpot)
 {
-	for (const TPair<UBoxComponent*, AActor*>& Pair : PickupLocations)
+	UBoxComponent* Spot = FindReservedPickupSpot(CharacterAskingForSpot);
+	if(Spot != nullptr)
 	{
-		if(Pair.Value == nullptr)
-		{
-			PickupLocations.Emplace(Pair.Key, ActorAskingForSpot);
-			UE_LOG(LogTemp, Warning, TEXT("A spot(%s) was reserved by: %s"), *Pair.Key->GetName(), *Pair.Value->GetName());
-			
-			return true;
-		}
+		return Spot;
 	}
-	return false;
+	else
+	{
+		for (TPair<UBoxComponent*, AActor*>& Pair : PickupLocations)
+		{
+			if(Pair.Value == nullptr)
+			{
+				PickupLocations.Emplace(Pair.Key, CharacterAskingForSpot);
+				UE_LOG(LogTemp, Error, TEXT("Spot reserved for: %s"), *CharacterAskingForSpot->GetName());
+				return Pair.Key;
+			}
+			
+		}
+		if(CheckResourceAvailability(EResourceType::Water, 1))
+		{
+			UE_LOG(LogTemp, Error, TEXT("We are full, but have water!!"));
+				
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("We are full, without resources!!"));
+
+		}
+		
+		return nullptr;
+	}
 }
 
+UBoxComponent* ACartBaseActor::FindReservedPickupSpot(ACharacterSettler* CharacterAskingForSpot)
+{
+	//Check if the character already is in tmap
+	for (TPair<UBoxComponent*, AActor*>& Pair : PickupLocations)
+	{
+		if(Pair.Value != nullptr)
+		{
+			if(Pair.Value == CharacterAskingForSpot)
+			{
+				return Pair.Key;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+UBoxComponent* ACartBaseActor::FreePickupSpot(ACharacterSettler* CharacterAskingForSpot)
+{
+	//Check if the character already is in tmap
+	for (TPair<UBoxComponent*, AActor*>& Pair : PickupLocations)
+	{
+		if(Pair.Value == CharacterAskingForSpot)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Spot deleted by: %s"), *CharacterAskingForSpot->GetName());
+
+			Pair.Value = nullptr; 
+		}
+	}
+
+	return nullptr;
+}
 
 

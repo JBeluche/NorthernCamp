@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Navigation/CrowdFollowingComponent.h"
 #include "NorthernCamp/Controllers/DayNightActorController.h"
 
 #include "AIControllerBase.generated.h"

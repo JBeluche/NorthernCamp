@@ -3,6 +3,8 @@
 
 #include "NorthernCamp/Characters/CharacterBase.h"
 
+#include "GameFramework/CharacterMovementComponent.h"
+
 // Sets default values
 ACharacterBase::ACharacterBase()
 {
@@ -15,7 +17,10 @@ ACharacterBase::ACharacterBase()
 void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	GetCharacterMovement()->bUseRVOAvoidance = true;
+
+
+
 }
 
 // Called every frame

@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Components/BoxComponent.h"
+#include "Components/ResourceManagerComponent.h"
 #include "GameFramework/Actor.h"
 #include "CartBaseActor.generated.h"
 
 
+class ACharacterSettler;
 enum class EResourceType : uint8;
 UCLASS()
 class NORTHERNCAMP_API ACartBaseActor : public AActor
@@ -35,9 +37,13 @@ public:
 	bool ExtractRersouce(EResourceType ResourceType, int32 Amount);
 	bool CheckResourceAvailability(EResourceType ResourceType, int32 Amount);
 	
-	bool ReservePickupSpot(AActor* ActorAskingForSpot);
-	
+	UBoxComponent* ReservePickupSpot(ACharacterSettler* CharacterAskingForSpot);
+	UBoxComponent* FindReservedPickupSpot(ACharacterSettler* CharacterAskingForSpot);
+	UBoxComponent* FreePickupSpot(ACharacterSettler* CharacterAskingForSpot);
+
 	TMap<UBoxComponent*, AActor*> PickupLocations;
+	
+	UResourceManagerComponent* ResourceManagerComp;
 
 protected:
 	

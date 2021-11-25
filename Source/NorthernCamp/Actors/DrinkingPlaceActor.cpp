@@ -10,6 +10,7 @@ ADrinkingPlaceActor::ADrinkingPlaceActor()
 	PrimaryActorTick.bCanEverTick = false;
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 	SetRootComponent(SceneComponent);
+	ResourceManagerComp = CreateDefaultSubobject<UResourceManagerComponent>(TEXT("Resource Manager"));
 }
 
 // Called when the game starts or when spawned
@@ -19,7 +20,7 @@ void ADrinkingPlaceActor::BeginPlay()
 	
 }
 
-bool ADrinkingPlaceActor::Drink()
+bool ADrinkingPlaceActor::PickupWater()
 {
 	return true;
 }

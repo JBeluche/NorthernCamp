@@ -11,7 +11,7 @@
 
 UBTS_UpdateWaterLocation::UBTS_UpdateWaterLocation()
 {
-	NodeName = "Update Water Location";
+	NodeName = "Update Water Actor and Location";
 }
 
 void UBTS_UpdateWaterLocation::TickNode(UBehaviorTreeComponent &OwnerComp, uint8 *NodeMemory, float DeltaSeconds) 
@@ -20,34 +20,29 @@ void UBTS_UpdateWaterLocation::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
 
 	AAISettlerController* Controller = Cast<AAISettlerController>(OwnerComp.GetAIOwner());
 	ACharacterSettler* Settler = Cast<ACharacterSettler>(Controller->GetPawn());
-	FVector ClosestWaterLocation;
-	bool FoundWater = false;
+	AActor* ClosestActorWithWater = nullptr;
 	
 	NavigationSystemv1 = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
 	
 	if(NavigationSystemv1)
 	{
-		if(Controller != nullptr && Settler != nullptr)
+		if(Controller != nullptr || Settler != nullptr)
 		{
 			float NewPathLength;
-			float OldPathLength = NULL;
+			float OldPathLength;
 			
 			//Check closest water source
 			for (TActorIterator<ADrinkingPlaceActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 			{
-								
 				NavigationSystemv1->GetPathLength(Settler->GetActorLocation(), ActorItr->GetActorLocation(), NewPathLength);
-				if(OldPathLength == NULL){OldPathLength = NewPathLength;}
 
-				if(FoundWater == false)
+				if(ClosestActorWithWater == nullptr)
 				{
-					FoundWater = true;
-					ClosestWaterLocation = ActorItr->GetActorLocation();
+					ClosestActorWithWater = *ActorItr;
 				}
 				else if(NewPathLength < OldPathLength)
 				{
-					FoundWater = true;
-					ClosestWaterLocation = ActorItr->GetActorLocation();
+					ClosestActorWithWater = *ActorItr;
 				}
 				OldPathLength = NewPathLength;
 			}
@@ -55,19 +50,16 @@ void UBTS_UpdateWaterLocation::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
 			//Check any carts for water
 			for (TActorIterator<ACartBaseActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 			{
+
 				NavigationSystemv1->GetPathLength(Settler->GetActorLocation(), ActorItr->GetActorLocation(), NewPathLength);
 				
-				if(OldPathLength == NULL){OldPathLength = NewPathLength;}
-
-				if(FoundWater == false && ActorItr->CheckResourceAvailability(EResourceType::Water, 1))
+				if(ClosestActorWithWater == nullptr && ActorItr->CheckResourceAvailability(EResourceType::Water, 1))
 				{
-					FoundWater = true;
-					ClosestWaterLocation = ActorItr->GetActorLocation();
+					ClosestActorWithWater = *ActorItr;
 				}
 				else if(NewPathLength < OldPathLength  && ActorItr->CheckResourceAvailability(EResourceType::Water, 1))
 				{
-					FoundWater = true;
-					ClosestWaterLocation = ActorItr->GetActorLocation();
+					ClosestActorWithWater = *ActorItr;
 				}
 				OldPathLength = NewPathLength;
 			}
@@ -76,31 +68,39 @@ void UBTS_UpdateWaterLocation::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
 			for (TActorIterator<ABuildingBaseActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 			{
 				NavigationSystemv1->GetPathLength(Settler->GetActorLocation(), ActorItr->GetActorLocation(), NewPathLength);
-				if(OldPathLength == NULL){OldPathLength = NewPathLength;}
 
-				if(FoundWater == false  && ActorItr->CheckResourceAvailability(EResourceType::Water, 1))
+				if(ClosestActorWithWater == nullptr  && ActorItr->CheckResourceAvailability(EResourceType::Water, 1))
 				{
-					FoundWater = true;
-					ClosestWaterLocation = ActorItr->GetActorLocation();
+					ClosestActorWithWater = *ActorItr;
 				}
 				else if(NewPathLength < OldPathLength  && ActorItr->CheckResourceAvailability(EResourceType::Water, 1))
 				{
-					FoundWater = true;
-					ClosestWaterLocation = ActorItr->GetActorLocation();
+					ClosestActorWithWater = *ActorItr;
 				}
 				OldPathLength = NewPathLength;
 			}
 
 		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Casting failed in BTS_UpdateWaterLocation"), *Settler->GetName());
+		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Settler: %s | Not finding the navigation system"), *Settler->GetName());
+		UE_LOG(LogTemp, Error, TEXT("A settler is not finding the navigation system"));
 	}
 
-	if(FoundWater)
+	if(ClosestActorWithWater)
 	{
-		OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(), ClosestWaterLocation);
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("PickupActor"), ClosestActorWithWater);
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bResourceStillAvailable"), true);
+
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(), ClosestActorWithWater->GetActorLocation());
+	}
+	else
+	{
+		OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bResourceStillAvailable"), false);
 	}
 
 }

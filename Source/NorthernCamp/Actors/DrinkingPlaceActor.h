@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/ResourceManagerComponent.h"
 #include "GameFramework/Actor.h"
 #include "DrinkingPlaceActor.generated.h"
 
@@ -21,8 +22,11 @@ public:
 
 
 	//Public functions
-	bool Drink();
-	
+	bool PickupWater();
+
+	//Public Variables
+	UResourceManagerComponent* ResourceManagerComp;
+
 protected:
 
 	virtual void BeginPlay() override;

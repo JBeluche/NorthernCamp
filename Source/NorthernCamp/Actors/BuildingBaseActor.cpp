@@ -10,8 +10,10 @@ ABuildingBaseActor::ABuildingBaseActor()
 	PrimaryActorTick.bCanEverTick = false;
 	
 	BuildingActionRadius = CreateDefaultSubobject<USphereComponent>(TEXT("Action radius"));
-	BuildingActionRadius->SetupAttachment(RootComponent);
+	ResourceManagerComp = CreateDefaultSubobject<UResourceManagerComponent>(TEXT("Resource Manager"));
 	
+	BuildingActionRadius->SetupAttachment(RootComponent);
+	AddOwnedComponent(ResourceManagerComp);
 
 }
 
