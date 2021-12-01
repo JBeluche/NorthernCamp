@@ -11,6 +11,8 @@ ADrinkingPlaceActor::ADrinkingPlaceActor()
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 	SetRootComponent(SceneComponent);
 	ResourceManagerComp = CreateDefaultSubobject<UResourceManagerComponent>(TEXT("Resource Manager"));
+	ResourceManagerComp->AddEndlessResource(EResourceType::Water);
+
 }
 
 // Called when the game starts or when spawned
@@ -20,8 +22,5 @@ void ADrinkingPlaceActor::BeginPlay()
 	
 }
 
-bool ADrinkingPlaceActor::PickupWater()
-{
-	return true;
-}
+
 

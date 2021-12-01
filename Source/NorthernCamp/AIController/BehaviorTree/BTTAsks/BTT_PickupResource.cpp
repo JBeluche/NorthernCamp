@@ -21,40 +21,32 @@ EBTNodeResult::Type UBTT_PickupResource::ExecuteTask(UBehaviorTreeComponent& Own
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
 	//Cast the box component
-	UBoxComponent* BoxComponent = Cast<UBoxComponent>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PickupComponent")));
+	UResourcesPickupSpot* PickupSpot = Cast<UResourcesPickupSpot>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PickupComponent")));
+	AActor* Actor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PickupActor")));
+
+	
 
 	bool PickedResource = false;
 
-	if(BoxComponent)
+	if(PickupSpot && Actor)
 	{
 		AAISettlerController* Controller = Cast<AAISettlerController>(OwnerComp.GetAIOwner());
 		ACharacterSettler* Settler = Cast<ACharacterSettler>(Controller->GetPawn());
-		
-		//Cast to cart, building, watersource
-		ABuildingBaseActor* Building = Cast<ABuildingBaseActor>(BoxComponent->GetOwner());
-		ACartBaseActor* Cart = Cast<ACartBaseActor>(BoxComponent->GetOwner());
-		ADrinkingPlaceActor* WaterSource = Cast<ADrinkingPlaceActor>(BoxComponent->GetOwner());
+		ACharacter* Character = Cast<ACharacter>(Controller->GetPawn());
 
-		if(WaterSource)
+		UResourceManagerComponent* ResourceManagerComp = Cast<UResourceManagerComponent>(Actor->GetComponentByClass(UResourceManagerComponent::StaticClass()));
+
+		
+		if(ResourceManagerComp)
 		{
-			PickedResource = WaterSource->PickupWater();
-		}
-		else if(Cart)
-		{
-			PickedResource = Cart->ExtractRersouce(EResourceType::Water, 1);
-			
-		}
-		else if (Building)
-		{
-			PickedResource = Building->ExtractRersouce(EResourceType::Water, 1);
+			PickedResource = ResourceManagerComp->ExtractRersouce(Settler->ResourceManagerComp->GetResourceNeed().ResourceType, Settler->ResourceManagerComp->GetResourceNeed().Amount, Character);
 		}
 
 		if(PickedResource)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s: took water"), *Controller->GetPawn()->GetName());
 
 			//Add to settlers hand
-			Settler->PutResourceInHand(EResourceType::Water, 1);
+			Settler->PutResourceInHand(Settler->ResourceManagerComp->GetResourceNeed().ResourceType, Settler->ResourceManagerComp->GetResourceNeed().Amount);
 			OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bHasWaterInHand"), true);
 			
 			return EBTNodeResult::Succeeded;

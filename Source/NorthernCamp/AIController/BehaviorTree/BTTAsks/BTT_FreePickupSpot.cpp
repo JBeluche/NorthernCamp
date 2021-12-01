@@ -19,36 +19,25 @@ EBTNodeResult::Type UBTT_FreePickupSpot::ExecuteTask(UBehaviorTreeComponent& Own
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
 	ACharacterSettler* Settler  = Cast<ACharacterSettler>(OwnerComp.GetAIOwner()->GetPawn());
+	AActor* Actor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PickupActor")));
+
+	//Get the component
+	if(Actor)
+	{
+		UResourceManagerComponent* ResourceManagerComp = Cast<UResourceManagerComponent>(Actor->GetComponentByClass(UResourceManagerComponent::StaticClass()));
+		if(ResourceManagerComp)
+		{
+			ResourceManagerComp->FreePickupSpot(Settler);
+		}
+	}
 	
-	//Cast to cart, building, watersource
-	/*ABuildingBaseActor* Building = Cast<ABuildingBaseActor>(Actor);
-	ACartBaseActor* Cart = Cast<ACartBaseActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PickupActor")));
-	ADrinkingPlaceActor* WaterSource = Cast<ADrinkingPlaceActor>(Actor);
-
-	if(WaterSource)
-	{
-
-
-	}
-	else if(Cart)
-	{
-		Cart->FreePickupSpot(Settler);
-	}
-	else if(Building)
-	{
-		
-	}*/
-	ACartBaseActor* Cart = Cast<ACartBaseActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PickupActor")));
-	if(Cart)
-	{
-		Cart->FreePickupSpot(Settler);
-	}
-
-		OwnerComp.GetBlackboardComponent()->ClearValue(TEXT("PickupComponent"));
-		OwnerComp.GetBlackboardComponent()->ClearValue(TEXT("PickupLocation"));
-		OwnerComp.GetBlackboardComponent()->ClearValue(TEXT("PickupActor"));
+	UE_LOG(LogTemp, Error,	TEXT("Firing freepickup"));
 	
-		return EBTNodeResult::Failed;
+	OwnerComp.GetBlackboardComponent()->ClearValue(TEXT("PickupComponent"));
+	OwnerComp.GetBlackboardComponent()->ClearValue(TEXT("PickupLocation"));
+	OwnerComp.GetBlackboardComponent()->ClearValue(TEXT("PickupActor"));
+
+	return EBTNodeResult::Failed;
 
 	
 }

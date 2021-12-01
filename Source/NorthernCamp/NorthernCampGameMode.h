@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Actors/Components/ResourceManagerComponent.h"
 
 #include "GameFramework/GameModeBase.h"
 #include "NorthernCampGameMode.generated.h"
@@ -15,7 +16,8 @@ class ANorthernCampGameMode : public AGameModeBase
 public:
 	ANorthernCampGameMode();
 
-
+	void AddResourceManager(UResourceManagerComponent* ResourceManager);
+	TArray<UResourceManagerComponent*> ResourceManagerComps;
 
 
 

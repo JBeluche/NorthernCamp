@@ -9,8 +9,8 @@
 ACharacterSettler::ACharacterSettler()
 {
 	VitalsComponent = CreateDefaultSubobject<UVitalsComponent>(TEXT("Vitals Component"));
+	ResourceManagerComp = CreateDefaultSubobject<UResourceManagerComponent>(TEXT("Resource Manager"));
 
-	
 
 }
 
@@ -66,3 +66,4 @@ void ACharacterSettler::DropResource()
 	ResourceAmountHandRight = 0;
 	ResourceAmountHandLeft = 0;
 }
+

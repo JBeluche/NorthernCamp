@@ -10,13 +10,7 @@
 #include "BuildingBaseActor.generated.h"
 
 
-enum class EResourceType : uint8 
-{
-	None UMETA(DisplayName = "None"),
-	Water UMETA(DisplayName = "Water"),
-	Food UMETA(DisplayName = "Food"),
-	
-};
+
 
 
 UCLASS()
@@ -32,20 +26,17 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 
-	TMap<EResourceType, int32> ResourcesStoredInBuilding;
-	TMap<EResourceType, int32> BuildingCost;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	int32 StartingFood;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	int32 StartingWater;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
-	USphereComponent* BuildingActionRadius;
-
-	bool ExtractRersouce(EResourceType ResourceType, int32 Amount);
-	bool CheckResourceAvailability(EResourceType ResourceType, int32 Amount);
-
+	
+	TMap<EResourceType, int32> BuildingCost;
+	
 	UResourceManagerComponent* ResourceManagerComp;
 
 	

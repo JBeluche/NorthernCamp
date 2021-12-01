@@ -22,27 +22,17 @@ EBTNodeResult::Type UBTT_ReservePickupSpot::ExecuteTask(UBehaviorTreeComponent& 
 	
 	AActor* Actor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PickupActor")));
 	
-	//Cast to cart, building, watersource
-	ABuildingBaseActor* Building = Cast<ABuildingBaseActor>(Actor);
-	ACartBaseActor* Cart = Cast<ACartBaseActor>(Actor);
-	ADrinkingPlaceActor* WaterSource = Cast<ADrinkingPlaceActor>(Actor);
-
-	
-
-	UBoxComponent* PickupComponent = nullptr;
-
-	if(WaterSource)
-	{
-
-
-	}
-	else if(Cart != nullptr)
-	{
-		PickupComponent = Cart->ReservePickupSpot(Settler);
-	}
-	else if(Building)
-	{
+	if(!Actor){return EBTNodeResult::Failed;}
 		
+	UResourceManagerComponent* ResourceManagerComp = Cast<UResourceManagerComponent>(Actor->GetComponentByClass(UResourceManagerComponent::StaticClass()));
+
+
+	UResourcesPickupSpot* PickupComponent = nullptr;
+	UResourcesPickupSpot* PreferablePickupSpot = Cast<UResourcesPickupSpot>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PreferablePickupSpot")));
+		
+	if(ResourceManagerComp)
+	{
+		PickupComponent = ResourceManagerComp->ReservePickupSpot(Settler, PreferablePickupSpot);
 	}
 	
 	if(PickupComponent != nullptr)

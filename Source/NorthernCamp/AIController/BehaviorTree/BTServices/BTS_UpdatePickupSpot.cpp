@@ -18,25 +18,23 @@ void UBTS_UpdatePickupSpot::TickNode(UBehaviorTreeComponent &OwnerComp, uint8 *N
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-
-
-
 	AActor* Actor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PickupActor")));
-	
-	ACartBaseActor* Cart = Cast<ACartBaseActor>(Actor);
-
-	//Check if the pickup actor still has water. If he has, do nothing.
 	bool StillHasWater = false;
-	
-	if(Cart)
+
+	//UResourceManagerComponent* ResourceManagerComp = Cast<UResourceManagerComponent>(Actor->GetComponentByClass(TSubclassOf<UResourceManagerComponent> ComponentClass));
+	if(Actor)
 	{
-		StillHasWater = Cart->CheckResourceAvailability(EResourceType::Water,1 );
+		UResourceManagerComponent* ResourceManagerComp = Cast<UResourceManagerComponent>(Actor->GetComponentByClass(UResourceManagerComponent::StaticClass()));
+		if(ResourceManagerComp)
+		{
+			StillHasWater = ResourceManagerComp->CheckResourceAvailability(EResourceType::Water,1 );
+		}
 	}
 	
-	//Else delete all the coresponding 
 	if(StillHasWater)
 	{
-		UBoxComponent* PickupComponent = Cast<UBoxComponent>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PickupComponent")));
+		UResourcesPickupSpot* PickupComponent = Cast<UResourcesPickupSpot>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PickupComponent")));
+		
 		if(PickupComponent)
 		{
 			//Check if the component is still the one from the current actor.

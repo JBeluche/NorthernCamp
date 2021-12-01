@@ -33,11 +33,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (AllowPrivateAccess = "true"))
 	float ActionRange = 100.0f;
 
-	bool DrinkWater(float Amount);
 
+//Public variables
+	UResourceManagerComponent* ResourceManagerComp;
+
+	int32 WorkHoursAmount;
+	int32 FunHoursAmount;
+	int32 SleepHoursAmount;
+	
+
+//Public functions
+	bool DrinkWater(float Amount);
 	bool CheckIfResourceInHand(EResourceType ResourceType, int32 Amount);
 	bool PutResourceInHand(EResourceType ResourceType, int32 Amount);
-	
+
 private:
 	//Can be item, resource or else?
 	EResourceType ResourceHandLeft = EResourceType::None;

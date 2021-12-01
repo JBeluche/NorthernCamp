@@ -29,6 +29,8 @@ public:
 	USkeletalMeshComponent* MeshComp;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	int32 StartingFood;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	int32 StartingWater;

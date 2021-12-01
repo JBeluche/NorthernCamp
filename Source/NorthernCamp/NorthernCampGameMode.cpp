@@ -20,3 +20,12 @@ ANorthernCampGameMode::ANorthernCampGameMode()
 	
 }
 
+void ANorthernCampGameMode::AddResourceManager(UResourceManagerComponent* ResourceManager)
+{
+	if(ResourceManagerComps.Contains(ResourceManager))
+	{
+		return;
+	}
+	ResourceManagerComps.Add(ResourceManager);
+}
+

@@ -5,9 +5,12 @@
 
 #include "EngineUtils.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "NorthernCamp/NorthernCampGameMode.h"
 #include "NorthernCamp/Actors/CartBaseActor.h"
 #include "NorthernCamp/Actors/DrinkingPlaceActor.h"
 #include "NorthernCamp/AIController/AISettlerController.h"
+#include "UObject/UObjectIterator.h"
+
 
 UBTS_UpdateWaterLocation::UBTS_UpdateWaterLocation()
 {
@@ -21,7 +24,8 @@ void UBTS_UpdateWaterLocation::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
 	AAISettlerController* Controller = Cast<AAISettlerController>(OwnerComp.GetAIOwner());
 	ACharacterSettler* Settler = Cast<ACharacterSettler>(Controller->GetPawn());
 	AActor* ClosestActorWithWater = nullptr;
-	
+	FVector PickupLocation;
+	UResourcesPickupSpot* PikcupSpotPtr = nullptr;
 	NavigationSystemv1 = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
 	
 	if(NavigationSystemv1)
@@ -30,60 +34,43 @@ void UBTS_UpdateWaterLocation::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
 		{
 			float NewPathLength;
 			float OldPathLength;
+
+			EResourceType ResourcesNeeded = Settler->ResourceManagerComp->GetResourceNeed().ResourceType;
+			int32 ResourceAmountNeeded = Settler->ResourceManagerComp->GetResourceNeed().Amount;
+
+			ANorthernCampGameMode * GameMode = Cast<ANorthernCampGameMode>(GetWorld()->GetAuthGameMode());
+		
 			
-			//Check closest water source
-			for (TActorIterator<ADrinkingPlaceActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+			if(GameMode)
 			{
-				NavigationSystemv1->GetPathLength(Settler->GetActorLocation(), ActorItr->GetActorLocation(), NewPathLength);
+				for (UResourceManagerComponent* ResourceManagerComp : GameMode->ResourceManagerComps)
+				{
+					//Iterate all the spots
+					for (auto& PickupSpot : ResourceManagerComp->PickupLocations)
+					{
 
-				if(ClosestActorWithWater == nullptr)
-				{
-					ClosestActorWithWater = *ActorItr;
+						NavigationSystemv1->GetPathLength(Settler->GetActorLocation(), PickupSpot.Key->GetComponentLocation(), NewPathLength);
+
+						if(ClosestActorWithWater == nullptr && ResourceManagerComp->CheckResourceAvailability(ResourcesNeeded, ResourceAmountNeeded))
+						{
+							PikcupSpotPtr = PickupSpot.Key;
+							ClosestActorWithWater = ResourceManagerComp->GetOwner();
+							OldPathLength = NewPathLength;
+
+						}
+						else if(NewPathLength < OldPathLength && ResourceManagerComp->CheckResourceAvailability(ResourcesNeeded, ResourceAmountNeeded))
+						{
+							PikcupSpotPtr = PickupSpot.Key;
+							ClosestActorWithWater = ResourceManagerComp->GetOwner();
+							OldPathLength = NewPathLength;
+						}
+					}
 				}
-				else if(NewPathLength < OldPathLength)
-				{
-					ClosestActorWithWater = *ActorItr;
-				}
-				OldPathLength = NewPathLength;
 			}
-
-			//Check any carts for water
-			for (TActorIterator<ACartBaseActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-			{
-
-				NavigationSystemv1->GetPathLength(Settler->GetActorLocation(), ActorItr->GetActorLocation(), NewPathLength);
-				
-				if(ClosestActorWithWater == nullptr && ActorItr->CheckResourceAvailability(EResourceType::Water, 1))
-				{
-					ClosestActorWithWater = *ActorItr;
-				}
-				else if(NewPathLength < OldPathLength  && ActorItr->CheckResourceAvailability(EResourceType::Water, 1))
-				{
-					ClosestActorWithWater = *ActorItr;
-				}
-				OldPathLength = NewPathLength;
-			}
-
-			//Check buildings for water
-			for (TActorIterator<ABuildingBaseActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-			{
-				NavigationSystemv1->GetPathLength(Settler->GetActorLocation(), ActorItr->GetActorLocation(), NewPathLength);
-
-				if(ClosestActorWithWater == nullptr  && ActorItr->CheckResourceAvailability(EResourceType::Water, 1))
-				{
-					ClosestActorWithWater = *ActorItr;
-				}
-				else if(NewPathLength < OldPathLength  && ActorItr->CheckResourceAvailability(EResourceType::Water, 1))
-				{
-					ClosestActorWithWater = *ActorItr;
-				}
-				OldPathLength = NewPathLength;
-			}
-
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("Casting failed in BTS_UpdateWaterLocation"), *Settler->GetName());
+			UE_LOG(LogTemp, Error, TEXT("Casting failed in BTS_UpdateWaterLocation"));
 		}
 	}
 	else
@@ -93,10 +80,13 @@ void UBTS_UpdateWaterLocation::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
 
 	if(ClosestActorWithWater)
 	{
+		UE_LOG(LogTemp, Error, TEXT("Going for: %s"), *ClosestActorWithWater->GetName());
+
 		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("PickupActor"), ClosestActorWithWater);
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bResourceStillAvailable"), true);
-
-		OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(), ClosestActorWithWater->GetActorLocation());
+		
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("PreferablePickupSpot"), PikcupSpotPtr);
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(), PikcupSpotPtr->GetComponentLocation());
 	}
 	else
 	{

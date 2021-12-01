@@ -4,11 +4,7 @@
 #include "NorthernCamp/AIController/BehaviorTree/BTTAsks/BTT_Drink.h"
 
 #include "AIController.h"
-#include "EngineUtils.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "NorthernCamp/Actors/BuildingBaseActor.h"
-#include "NorthernCamp/Actors/CartBaseActor.h"
-#include "NorthernCamp/Actors/DrinkingPlaceActor.h"
 #include "NorthernCamp/AIController/AISettlerController.h"
 #include "NorthernCamp/Characters/CharacterSettler.h"
 
