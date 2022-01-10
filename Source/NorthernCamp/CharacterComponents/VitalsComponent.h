@@ -41,6 +41,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Water Meter")
 	float WaterIsLowThreshold;
 
+	bool NeedWater;
+	bool NeedFood;
+	
 
 	//////
 	// FOOD

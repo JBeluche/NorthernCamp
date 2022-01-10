@@ -5,16 +5,9 @@
 #include "CoreMinimal.h"
 #include "ResourcesPickupSpot.h"
 #include "Components/ActorComponent.h"
-#include "Components/BoxComponent.h"
+#include "NorthernCamp/Controllers/ResourceController.h"
 #include "ResourceManagerComponent.generated.h"
 
-enum class EResourceType : uint8 
-{
-	None UMETA(DisplayName = "None"),
-	Water UMETA(DisplayName = "Water"),
-	Food UMETA(DisplayName = "Food"),
-	
-};
 
 USTRUCT()
 struct FResourceNeedStruct
@@ -23,7 +16,6 @@ struct FResourceNeedStruct
 
 	EResourceType ResourceType = EResourceType::None;
 	int32 Amount = 0;
-	//int32 Urgency = 0;
 };
 
 
@@ -62,9 +54,12 @@ public:
 	UResourcesPickupSpot* FreePickupSpot(ACharacter* CharacterAskingForSpot);
 
 	void AddEndlessResource(EResourceType ResourceType);
+	
 
 //Public variables
 	TMap<UResourcesPickupSpot*, AActor*> PickupLocations;
+	
+
 
 
 		

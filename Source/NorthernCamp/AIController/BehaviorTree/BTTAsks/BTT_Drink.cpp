@@ -24,7 +24,6 @@ EBTNodeResult::Type UBTT_Drink::ExecuteTask(UBehaviorTreeComponent& OwnerComp, u
 	
 	Settler->DrinkWater(10000.0f);
 
-	UE_LOG(LogTemp, Error, TEXT("Spot deleted by: %s"), *Settler->GetName());
 	OwnerComp.GetBlackboardComponent()->ClearValue(TEXT("bIsThirsty"));
 	
 	return EBTNodeResult::Succeeded;

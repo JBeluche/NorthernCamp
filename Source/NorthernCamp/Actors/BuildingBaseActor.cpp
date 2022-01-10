@@ -3,6 +3,10 @@
 
 #include "NorthernCamp/Actors/BuildingBaseActor.h"
 
+#include "Components/SleepingSpot.h"
+#include "Components/WorkingSpot.h"
+#include "NorthernCamp/Characters/CharacterSettler.h"
+
 // Sets default values
 ABuildingBaseActor::ABuildingBaseActor()
 {
@@ -19,5 +23,107 @@ void ABuildingBaseActor::BeginPlay()
 
 	ResourceManagerComp->AddResource(EResourceType::Water, StartingWater);
 	ResourceManagerComp->AddResource(EResourceType::Food, StartingFood);
+	
+	TInlineComponentArray<USleepingSpot*> SlepingSpotscomponents;
+	TInlineComponentArray<UWorkingSpot*> WorkingSpotscomponents;
+	GetComponents(WorkingSpotscomponents);
+	GetComponents(SlepingSpotscomponents);
+
+	for (auto CompIt = SlepingSpotscomponents.CreateConstIterator(); CompIt; ++CompIt)
+	{
+		SleepingSpots.Emplace(Cast<USleepingSpot>(*CompIt), nullptr);
+	}
+
+	for (USleepingSpot* CompIt :  SlepingSpotscomponents)
+	{
+		SleepingSpots.Emplace(Cast<USleepingSpot>(CompIt), nullptr);
+	}
+	for (UWorkingSpot* CompIt :  WorkingSpotscomponents)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Has found a working spot"));
+		WorkingSpots.Emplace(Cast<UWorkingSpot>(CompIt), nullptr);
+	}
+}
+
+USleepingSpot* ABuildingBaseActor::AddInhabitant(ACharacter* Settler)
+{
+	for (TPair<USleepingSpot*, ACharacter*>& Pair : SleepingSpots)
+	{
+		if(Pair.Value == nullptr)
+		{
+			SleepingSpots.Emplace(Pair.Key, Settler);
+			return Pair.Key;
+		}
+	}
+	return nullptr;
+}
+void ABuildingBaseActor::RemoveInhabitant(ACharacter* Settler)
+{
+	for (TPair<USleepingSpot*, ACharacter*>& Pair : SleepingSpots)
+	{
+		if(Pair.Value == Settler)
+		{
+			SleepingSpots.Emplace(Pair.Key, nullptr);
+			
+		}
+	}
+}
+
+TArray<USleepingSpot*> ABuildingBaseActor::GetFreeSleepingSpots()
+{
+	TArray<USleepingSpot*> FreeSleepingSpots;
+	
+	for (TPair<USleepingSpot*, ACharacter*>& Pair : SleepingSpots)
+	{
+		if(Pair.Value == nullptr)
+		{
+			FreeSleepingSpots.Add(Pair.Key);
+		}
+	}
+
+	return FreeSleepingSpots;
+}
+
+
+void ABuildingBaseActor::RemoveWorker(ACharacterSettler* Settler)
+{
+	for (TPair<UWorkingSpot*, ACharacterSettler*>& Pair : WorkingSpots)
+	{
+		if(Pair.Value == Settler)
+		{
+			WorkingSpots.Emplace(Pair.Key, nullptr);
+		}
+	}
+}
+
+UWorkingSpot* ABuildingBaseActor::AddWorker(ACharacterSettler* Settler)
+{
+	for (TPair<UWorkingSpot*, ACharacterSettler*>& Pair : WorkingSpots)
+	{
+		if(Pair.Value == nullptr)
+		{
+			WorkingSpots.Emplace(Pair.Key, nullptr);
+			return Pair.Key;
+		}
+	}
+	return nullptr;
+
+}
+
+TArray<UWorkingSpot*> ABuildingBaseActor::GetFreeWorkingSpot()
+{
+	TArray<UWorkingSpot*> FreeWorkingSpots;
+	
+	for (TPair<UWorkingSpot*, ACharacterSettler*>& Pair : WorkingSpots)
+	{
+		if(Pair.Value == nullptr)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Has found a working spot that is free"));
+
+			FreeWorkingSpots.Add(Pair.Key);
+		}
+	}
+
+	return FreeWorkingSpots;
 }
 

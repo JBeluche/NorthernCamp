@@ -17,6 +17,7 @@ UResourceManagerComponent::UResourceManagerComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 
 
+     
 }
 
 
@@ -24,6 +25,11 @@ UResourceManagerComponent::UResourceManagerComponent()
 void UResourceManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	
+
+
+	
 
 	AActor* Owner = Cast<AActor>(GetOwner());
 	if(Owner)
@@ -60,12 +66,15 @@ bool UResourceManagerComponent::ExtractRersouce(EResourceType ResourceType, int3
 
 	//This is just for debuging
 	FString EnumName;
-	const UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("ResourceType"), true);
+	const UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EResourceType"), true);
 	if (!enumPtr)
 	{
 		EnumName = FString("Invalid");
 	}
-	EnumName = enumPtr->GetNameStringByIndex((int32)ResourceType);
+	else
+	{
+		EnumName = enumPtr->GetNameStringByIndex((int32)ResourceType);
+	}
 	
 	//End debug shit
 	bool ResourceIsAvailable = CheckResourceAvailability(ResourceType, Amount);

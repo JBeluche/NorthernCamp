@@ -18,56 +18,39 @@
 #include "EngineUtils.h"
 #include "NavigationSystem.h"
 
-
-///////
-//	
-///////
-
 ANorthernCampPlayerController::ANorthernCampPlayerController()
 {
-	
-	bShowMouseCursor = true;
+		bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
-
-	const ConstructorHelpers::FClassFinder<UUserWidget> WBPControlsLooseCamera(TEXT("/Game/Blueprints/UserWidgets/WBP_LooseCameraMain"));
-	const ConstructorHelpers::FClassFinder<UUserWidget> WBPSettlersInfoUserWidget(TEXT("/Game/Blueprints/UserWidgets/WBP_SettlerInfo"));
-	ConstructorHelpers::FClassFinder<UUserWidget> WBPControlsCamp(TEXT("/Game/Blueprints/UserWidgets/WBP_CampCameraControls"));
-	//ConstructorHelpers::FClassFinder<UUserWidget> DialogWidgetClass(TEXT("/Game/Blueprints/Widgets/WBP_Dialog"));
-
-	
-	
-	LooseCameraUserWidget = WBPControlsLooseCamera.Class;
-	SettlerInfoUserWidget = WBPSettlersInfoUserWidget.Class;
-	CampControlClass = WBPControlsCamp.Class;
-	//DialogWidget = DialogWidgetClass.Class;
-
 	CampCameraPawn = nullptr;
 	LooseCameraPawn = nullptr;
 	SelectedHero = nullptr;
 	SelectedSettler = nullptr;
-
-	
+	UIController = CreateDefaultSubobject<UUIController>(TEXT("UI Controller"));
 }
 
 void ANorthernCampPlayerController::BeginPlay()
 {
+	for (TActorIterator<AResourceController> ActorItr(GetWorld()); ActorItr; ++ActorItr) 
+	{ 
+		ResourceController = Cast<AResourceController>(*ActorItr); 
+	}
 
+	//Development settup basics
 	SwitchPawn(ECurrentPawn::LooseCamera);
 	SetSelectedHero(EHero::Will);
-
-	FingerTouchDuration = 0.0f;
 	
-	//Command to make the shadows appear for longer distances.
+	//Setup basic stuff
 	GEngine->Exec( GetWorld(), TEXT( "r.Shadow.RadiusThreshold 0.01" ) );
 	GEngine->Exec( GetWorld(), TEXT( "stat fps" ) );
+
 }
 
 void ANorthernCampPlayerController::PlayerTick(float DeltaTime)
 {
-
 	Super::PlayerTick(DeltaTime);
 
-	//Easy way to measure amount of ticks.
+	//Easy way to measure amount of ticks. Should use a timer to measure how long the touch is pressed?
 	Time = Time + 1.0f;
 
 	if(CurrentPawnEnum == ECurrentPawn::LooseCamera){KeepCameraInHeroBounds(DeltaTime);}
@@ -102,7 +85,7 @@ void ANorthernCampPlayerController::SwitchPawn(ECurrentPawn NewPawn)
 		if(LooseCameraPawn != nullptr)
 		{
 			Possess(LooseCameraPawn);
-			UpdateUI(ECurrentUI::LooseCamera);
+			UIController->UpdateUI(ECurrentUI::LooseCamera);
 			SetNewOwner();	
 		}
 	}
@@ -115,7 +98,7 @@ void ANorthernCampPlayerController::SwitchPawn(ECurrentPawn NewPawn)
 		if(CampCameraPawn != nullptr)
 		{
 			Possess(CampCameraPawn);
-			UpdateUI(ECurrentUI::Camp);
+			UIController->UpdateUI(ECurrentUI::Camp);
 			SetNewOwner();
 		}
 	}
@@ -128,12 +111,13 @@ void ANorthernCampPlayerController::SetNewOwner()
 
 void ANorthernCampPlayerController::FingerTouchHandler(float DeltaTime)
 {
-
+	
 	//What to do if the finger is touching the screen
 	if (bIsFingerTouching)
 	{
+
 		//This is to check the initial starting points of the finger drag
-		if(FingerTouched == false)
+		if(FingerTouched == false && !UIController->bIsInMenu)
 		{
 			FingerTouched = true;
 			StartingLocationFingerX = NewTouchLocation.X;
@@ -150,18 +134,13 @@ void ANorthernCampPlayerController::FingerTouchHandler(float DeltaTime)
 			LastTouchHitResults);
 
 		MoveCameraAccordingToFinger();
-		
 	}
 	else
 	{
 		SelectSettlerCondition();
 		DoubleTapTouchCondition();
-		//Resetting everything to check again
-		PreviousTouchLocation.X = 0.0f;
-		PreviousTouchLocation.Y = 0.0f;
-		FingerTouchDuration = 0.0f;
 
-
+		ResetControlls();
 	}
 }
 
@@ -173,32 +152,9 @@ void ANorthernCampPlayerController::SelectSettlerCondition()
 		if(CurrentPawnEnum == ECurrentPawn::LooseCamera)
 		{
 			SelectedSettler = Cast<ACharacterSettler>(LastTouchHitResults.Actor);
-			UpdateUI(ECurrentUI::SettlerInfo);
+			UIController->UpdateUI(ECurrentUI::SettlerInfo);
 		}
 	}
-}
-
-void ANorthernCampPlayerController::UpdateUI(ECurrentUI NewCurrentUI)
-{
-	if(Controls){Controls->RemoveFromViewport();}
-	bIsInMenu = false;
-	CurrentScrollBar = nullptr;
-	if(NewCurrentUI == ECurrentUI::SettlerInfo)
-	{
-		Controls = CreateWidget<UUserWidget>(this, SettlerInfoUserWidget, FName("Settler Information Widget"));
-		CurrentScrollBar = Cast<UScrollBox>(Cast<USettlerInfoUserWidget>(Controls)->ScrollboxWholeWindow);
-		bIsInMenu = true;
-	}
-	else if(NewCurrentUI == ECurrentUI::LooseCamera)
-	{
-		Controls = CreateWidget<UUserWidget>(this, LooseCameraUserWidget, FName("Main Loose Camera Controls"));
-	}
-	else if(NewCurrentUI == ECurrentUI::Camp)
-	{
-		Controls = CreateWidget<UUserWidget>(this, CampControlClass, FName("Camp Controls"));
-	}
-	
-	Controls->AddToViewport();
 }
 
 void ANorthernCampPlayerController::DoubleTapTouchCondition()
@@ -225,7 +181,7 @@ void ANorthernCampPlayerController::DoubleTapTouchCondition()
 		FingerTapAmount = 0;
 		if(CurrentPawnEnum == ECurrentPawn::LooseCamera)
 		{
-			if(SelectedHero != nullptr)
+			if(SelectedHero != nullptr && UIController->bIsInMenu == false)
 			{
 				UAIBlueprintHelperLibrary::SimpleMoveToLocation(SelectedHero->GetController(), LastTouchHitResults.Location);
 			}
@@ -237,9 +193,23 @@ void ANorthernCampPlayerController::MoveCameraAccordingToFinger()
 {
 	if (MyOwner)
 	{
+		//This is here to fix the slider bar b.u.g. Which triggers endless touch events with incorrect locations
+		if(NewTouchLocation.X == BugLocationX && NewTouchLocation.Y == BugLocationY && bSliderBugActive)
+		{
+			return;
+		}
+		else if(bSliderBugActive)
+		{
+			bSliderBugActive = false;
+			return;
+		}
+
+
 		FVector CurrentLocation = MyOwner->GetActorLocation();
 		float FloatToAddOnY = (PreviousTouchLocation.X - NewTouchLocation.X) * 2.0f;
 		float FloatToAddOnX = (PreviousTouchLocation.Y - NewTouchLocation.Y) * 2.0f;
+
+		//UE_LOG(LogTemp, Error, TEXT("Previous location Y: %f, Z: %f"), PreviousTouchLocation.X, PreviousTouchLocation.Y);
 
 		if (PreviousTouchLocation.X == 0.0f)
 		{
@@ -250,19 +220,23 @@ void ANorthernCampPlayerController::MoveCameraAccordingToFinger()
 			FloatToAddOnX = 0.0f;
 		}
 		FVector NewLocation = MyOwner->GetActorLocation();
-		//Up and Down swipe is X
+		//Up and Down swipe is X	
 		FloatToAddOnX = -1 * FloatToAddOnX;
 		NewLocation.X = CurrentLocation.X + FloatToAddOnX;
 		//Left and right swipe is Y
 		NewLocation.Y = CurrentLocation.Y + FloatToAddOnY;
 
 		//Check if you need to move the actor or the screen scroll.
-		if(bIsInMenu)
+		if(UIController->bIsInMenu)
 		{
-			CurrentScrollBar->SetScrollOffset(FloatToAddOnY);
+			BugLocationX = PreviousTouchLocation.X;
+			BugLocationY = PreviousTouchLocation.Y;
+			bSliderBugActive = true;
+			ResetControlls();
 		}
 		else if(CurrentPawnEnum == ECurrentPawn::LooseCamera)
 		{
+
 			MyOwner->SetActorLocation(NewLocation);
 		}
 		else if(CurrentPawnEnum == ECurrentPawn::Camp)
@@ -275,7 +249,7 @@ void ANorthernCampPlayerController::MoveCameraAccordingToFinger()
 			{
 				NewRotation = 0.0f;
 			}
-
+		
 			MyOwner->SetActorRotation(FRotator(CurrentRotation.Pitch, (CurrentRotation.Yaw + NewRotation), CurrentRotation.Roll));
 		}
 		PreviousTouchLocation = NewTouchLocation;
@@ -296,8 +270,7 @@ void ANorthernCampPlayerController::KeepCameraInHeroBounds(float DeltaTime)
 	{
 		MyOwner->SetActorLocation(FMath::Lerp(CurrentLocation, HeroLocationXY, (DeltaTime * 1)));
 		bCameraIsMoving = true;
-		PreviousTouchLocation.X = 0.0f;
-		PreviousTouchLocation.Y = 0.0f;
+		ResetControlls();
 	}
 	else
 	{
@@ -320,12 +293,16 @@ void ANorthernCampPlayerController::SetSelectedHero(EHero CharacterHeroEnum)
 			return;
 		}
 	}
-
-
-
-	
-
 }
+
+
+void ANorthernCampPlayerController::ResetControlls()
+{
+	PreviousTouchLocation.X = 0.0f;
+	PreviousTouchLocation.Y = 0.0f;
+	FingerTouchDuration = 0.0f;
+}
+
 
 
 

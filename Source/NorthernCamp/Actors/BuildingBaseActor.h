@@ -5,14 +5,13 @@
 #include "CoreMinimal.h"
 #include "Components/ResourceManagerComponent.h"
 
-#include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
 #include "BuildingBaseActor.generated.h"
 
 
-
-
-
+class ACharacterSettler;
+class UWorkingSpot;
+class USleepingSpot;
 UCLASS()
 class NORTHERNCAMP_API ABuildingBaseActor : public AActor
 {
@@ -39,5 +38,28 @@ public:
 	
 	UResourceManagerComponent* ResourceManagerComp;
 
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
+	TArra SleepingSpots;*/
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
+	int32 WorkingSpotsAmount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
+	FSlateBrush BuildingIcon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
+	FText BuildingName;
 	
+	TMap<USleepingSpot*, ACharacter*> SleepingSpots;
+	TMap<UWorkingSpot*, ACharacterSettler*> WorkingSpots;
+
+	//Public functions
+		USleepingSpot* AddInhabitant(ACharacter* Settler);
+		void RemoveInhabitant(ACharacter* Settler);
+		TArray<USleepingSpot*> GetFreeSleepingSpots();
+		
+		void RemoveWorker(ACharacterSettler* Settler);
+		UWorkingSpot* AddWorker(ACharacterSettler* Settler);
+		TArray<UWorkingSpot*> GetFreeWorkingSpot();
+
 };

@@ -21,6 +21,7 @@ void ADayNightActorController::BeginPlay()
 
 	//Start the time timer
 	SetTimeTo(StartingHour, 0.0f);
+
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ADayNightActorController::MoveTime, TimeUpdatesInterval, true);
 
 	TotalDayLightTimeInVirtualMinutes = (SunsetHour - SunriseHour) * 60;
@@ -57,6 +58,7 @@ void ADayNightActorController::BeginPlay()
 
 	MoonSetStartInMinutes = SunriseStartInMinutes - MoonSetDuration;
 	MoonRiseEndInMinutes = SunsetEndInMinutes + MoonRiseDuration;
+
 }
 
 void ADayNightActorController::SetTimeTo(float HourToSet, float MinuteToSet)

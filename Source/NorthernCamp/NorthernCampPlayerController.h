@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Controllers/UIController.h"
 #include "GameFramework/PlayerController.h"
 #include "NorthernCamp/Characters/CharacterHero.h"
 
@@ -24,13 +25,7 @@ enum class ECurrentPawn : uint8
 	
 };
 
-UENUM(BlueprintType)
-enum class ECurrentUI : uint8 
-{
-	SettlerInfo UMETA(DisplayName = "Information Settler"),
-	LooseCamera UMETA(DisplayName = "Loose Camera"),
-	Camp UMETA(DisplayName = "Camp UI"),
-};
+
 
 UCLASS()
 class ANorthernCampPlayerController : public APlayerController
@@ -49,9 +44,15 @@ public:
 	
 	void SetSelectedHero(EHero CharacterHeroEnum);
 
-	
+	//Public variables
 	ACharacterSettler* SelectedSettler;
-	void UpdateUI(ECurrentUI NewCurrentUI);
+	UUIController* UIController;
+
+	AResourceController* ResourceController;
+
+	//Public functinos
+	void ResetControlls();
+	bool bSliderBugActive = false;
 
 
 protected:
@@ -63,16 +64,11 @@ protected:
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
+	int32 i = 0;
 
 private:
 
-	//Varaibles 
-	TSubclassOf<class UUserWidget> LooseCameraUserWidget;
-	TSubclassOf<class UUserWidget> CampControlClass;
-	TSubclassOf<class UUserWidget> DialogWidget;
-	TSubclassOf<class UUserWidget> SettlerInfoUserWidget;
-	
-	UUserWidget* Controls;
+	//Private variables
 	AActor* MyOwner;
 
 	UPROPERTY()
@@ -99,12 +95,13 @@ private:
 	bool FingerTouched;
 	float StartingLocationFingerX;
 	float StartingLocationFingerY;
+	float BugLocationY;
+	float BugLocationX;
+	int32  SliderBuggedTouchEventCount = 0;
 
-	bool bIsInMenu;
 
 
 
-	UScrollBox* CurrentScrollBar;
 	
 	//Functions
 	void SetNewOwner();

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "NorthernCamp/NorthernCampPlayerController.h"
 
@@ -34,9 +35,27 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	UButton* B_BackButton;
+	
+	UPROPERTY(meta = (BindWidget))
+	UButton* B_TimeManager;
 
+	UPROPERTY(meta = (BindWidget))
+	UButton* B_SetResidence;
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* B_SetWork;
+	
 	UFUNCTION()
 	void ExitInfoPanel();
+
+	UFUNCTION()
+	void OpenScheduleSettler();
+
+	UFUNCTION()
+	void OpenSelectWorkPopup();
+
+	UFUNCTION()
+	void OpenSelectResidencePopup();
 
 public:
 	//virtual void NativeConstruct() override;
@@ -64,6 +83,24 @@ public:
 	//Main functions widget
 	UPROPERTY(meta = (BindWidget))
 	UScrollBox* ScrollboxWholeWindow;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* T_Work;
+	
+	UPROPERTY(meta = (BindWidget))
+	UImage* IMG_Work;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* T_Residence;
+	
+	UPROPERTY(meta = (BindWidget))
+	UImage* IMG_Residence;
+
+	void RefreshSettlerInfo();
+
+	
+	
+
 	
 
 	

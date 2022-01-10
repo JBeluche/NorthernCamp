@@ -3,6 +3,7 @@
 
 #include "NorthernCamp/Characters/CharacterSettler.h"
 
+#include "EngineUtils.h"
 #include "NorthernCamp/CharacterComponents/VitalsComponent.h"
 
 
@@ -13,6 +14,51 @@ ACharacterSettler::ACharacterSettler()
 
 
 }
+void ACharacterSettler::BeginPlay()
+{
+	Super::BeginPlay();
+
+
+	for (TActorIterator<ADayNightActorController> ActorItr(GetWorld()); ActorItr; ++ActorItr) 
+	{ 
+		DayNightActorController = Cast<ADayNightActorController>(*ActorItr); 
+	}
+	
+	if(DayNightActorController) 
+	{ 
+		WorkHoursAmount = 12;
+		FunHoursAmount = 3;
+		SleepHoursAmount = 9;
+
+		HourStruck(DayNightActorController->CurrentTimeHours);
+
+		
+		DayNightActorController->AnHourStruck.AddDynamic(this, &ACharacterSettler::HourStruck); 
+	}
+	
+}
+
+void ACharacterSettler::HourStruck(float CurrentHour) 
+{
+	UpdateSchedule(CurrentHour);
+}
+
+void ACharacterSettler::UpdateSchedule(float CurrentHour)
+{
+	if(CurrentHour >= 6.0f && CurrentHour < (6.0f + WorkHoursAmount))
+	{
+		CurrentSchedule = ESettlerSchedule::Work;
+	}
+	else if(CurrentHour < 6.0f || CurrentHour >= (6.0f + WorkHoursAmount + FunHoursAmount))
+	{
+		CurrentSchedule = ESettlerSchedule::Sleep;
+	}
+	else
+	{
+		CurrentSchedule = ESettlerSchedule::Leisure;
+	}
+}
+
 
 UVitalsComponent* ACharacterSettler::GetCharacterVitalsComponent()
 {
@@ -66,4 +112,21 @@ void ACharacterSettler::DropResource()
 	ResourceAmountHandRight = 0;
 	ResourceAmountHandLeft = 0;
 }
+
+
+void ACharacterSettler::ResetCurrentWork()
+{
+	if(CurrentWork.WorkBuilding != nullptr)
+	{
+		ABuildingBaseActor* Building = CurrentWork.WorkBuilding;
+		Building->RemoveWorker(this);
+	}
+
+	CurrentWork.WorkBuilding = nullptr;
+	CurrentWork.WorkType = EWorkType::None;
+	CurrentWork.ResourceToGather = EResourceType::None;
+	
+}
+
+
 

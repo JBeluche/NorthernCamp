@@ -13,7 +13,7 @@ public class NorthernCamp : ModuleRules
 		//	UMG: To use userwidget blueprints
         PublicDependencyModuleNames.AddRange(new string[]
         {
-	        "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "NavigationSystem", "Landscape", "AIModule", "UMG", "GameplayTasks"
+	        "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "NavigationSystem", "Landscape", "AIModule", "UMG", "GameplayTasks", "Slate", "SlateCore"
         });
         
 

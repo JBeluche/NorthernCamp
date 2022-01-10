@@ -37,7 +37,7 @@ EBTNodeResult::Type UBTT_PickupResource::ExecuteTask(UBehaviorTreeComponent& Own
 		UResourceManagerComponent* ResourceManagerComp = Cast<UResourceManagerComponent>(Actor->GetComponentByClass(UResourceManagerComponent::StaticClass()));
 
 		
-		if(ResourceManagerComp)
+		if(ResourceManagerComp && Character)
 		{
 			PickedResource = ResourceManagerComp->ExtractRersouce(Settler->ResourceManagerComp->GetResourceNeed().ResourceType, Settler->ResourceManagerComp->GetResourceNeed().Amount, Character);
 		}
@@ -47,7 +47,7 @@ EBTNodeResult::Type UBTT_PickupResource::ExecuteTask(UBehaviorTreeComponent& Own
 
 			//Add to settlers hand
 			Settler->PutResourceInHand(Settler->ResourceManagerComp->GetResourceNeed().ResourceType, Settler->ResourceManagerComp->GetResourceNeed().Amount);
-			OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bHasWaterInHand"), true);
+			OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bResourcePicked"), true);
 			
 			return EBTNodeResult::Succeeded;
 		}

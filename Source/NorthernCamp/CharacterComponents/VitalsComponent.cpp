@@ -61,11 +61,15 @@ void UVitalsComponent::UpdateVitals()
 
 		//////
 		// WATER
-		//////
+
 		if(CurrentWaterMeter < WaterIsLowThreshold)
-        			{
-        				Controller->WaterIsLow();
-        			}
+        {
+        	NeedWater = true;
+        }
+		else
+		{
+			NeedWater = false;
+		}
         			
 		if(CurrentWaterMeter <= 0.0f)
 		{
@@ -82,7 +86,15 @@ void UVitalsComponent::UpdateVitals()
 	
 		//////
 		// FOOD
-		//////
+		if(CurrentWaterMeter < WaterIsLowThreshold)
+		{
+			NeedFood = true;
+		}
+		else
+		{
+			NeedFood = false;
+		}
+        		
 		if(CurrentFoodMeter <= 0.0f)
 		{
 			//You are dying 
@@ -97,7 +109,7 @@ void UVitalsComponent::UpdateVitals()
 
 		//////
 		// SLEEP
-		//////
+
 		if(CurrentSleepMeter <= 0.0f)
 		{
 			//You are dying 
@@ -113,7 +125,7 @@ void UVitalsComponent::UpdateVitals()
 		
 		//////
 		// FUN FIRE
-		//////
+	
 		if(CurrentFunFireMeter <= 0.0f)
 		{
 			//You are dying 
