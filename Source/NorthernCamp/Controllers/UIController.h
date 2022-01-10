@@ -46,11 +46,11 @@ public:
 	UScrollBox* CurrentScrollBar;
 
 	
-	//Small elements
-	TSubclassOf<class UUserWidget> SelectBuildingIcons;
-	TSubclassOf<class UUserWidget> ButtonGatherResource;
-	TSubclassOf<class UUserWidget> ButtonWorkBuilding;
-	TSubclassOf<class UUserWidget> AcceptPopup;
+	TSubclassOf<class UUserWidget> ConfirmationPopupWidget;
+
+	TSubclassOf<class UUserWidget> WorkplaceEntryWidget;
+	TSubclassOf<class UUserWidget> ResidenceEntryWidget;
+	TSubclassOf<class UUserWidget> GatherTaskEntryWidget;
 
 	UUserWidget* MainUI;
 	UUserWidget* Overlay;
@@ -61,28 +61,25 @@ protected:
 	virtual void BeginPlay() override;
 
 	//Protected Varaibles 
-	TSubclassOf<class UUserWidget> LooseCameraUserWidget;
-	TSubclassOf<class UUserWidget> CampControlClass;
+	TSubclassOf<class UUserWidget> LooseCameraControlsWidget;
+	TSubclassOf<class UUserWidget> CampCameraControlsWidget;
+	TSubclassOf<class UUserWidget> BattleCameraControlsWidget;
+
+	TSubclassOf<class UUserWidget> SettlerInformationWidget;
+
+	TSubclassOf<class UUserWidget> ScheduleSettingsWidget;
+	TSubclassOf<class UUserWidget> SelectResidenceWidget;
+	TSubclassOf<class UUserWidget> SelectWorkWidget;
+
+	TSubclassOf<class UUserWidget> BlackOverlayWidget;
+
+
+
 	TSubclassOf<class UUserWidget> DialogWidget;
-	TSubclassOf<class UUserWidget> SettlerInfoUserWidget;
-
-	//Popups
-	TSubclassOf<class UUserWidget> SettlerSchedulePopup;
-	TSubclassOf<class UUserWidget> SelectWorkPopup;
-	TSubclassOf<class UUserWidget> SelectResidencePopup;
-
-	
-
-	//Helpers
-	TSubclassOf<class UUserWidget> CustomOverlay;
-
 
 
 	ECurrentUI CurrentUI = ECurrentUI::LooseCamera;
 
-
 	ANorthernCampPlayerController* PlayerController;
-
-
 		
 };

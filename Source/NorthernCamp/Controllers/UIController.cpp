@@ -3,62 +3,82 @@
 
 #include "NorthernCamp/Controllers/UIController.h"
 
-#include <stdbool.h>
-
 #include "Blueprint/UserWidget.h"
-#include "Components/CanvasPanel.h"
 #include "Components/Image.h"
 #include "Components/ScrollBox.h"
-#include "NorthernCamp/UserWidgets/SettlerInfoUserWidget.h"
+#include "NorthernCamp/UserWidgets/SettlerInformations/SettlerInformationWidget.h"
 
 
 // Sets default values for this component's properties
 UUIController::UUIController()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	//Main constructors
-	const ConstructorHelpers::FClassFinder<UUserWidget> WBPControlsLooseCamera(TEXT("/Game/Blueprints/UserWidgets/WBP_LooseCameraMain"));
-	const ConstructorHelpers::FClassFinder<UUserWidget> WBPSettlersInfoUserWidget(TEXT("/Game/Blueprints/UserWidgets/WBP_SettlerInfo"));
-	const ConstructorHelpers::FClassFinder<UUserWidget> WBPControlsCamp(TEXT("/Game/Blueprints/UserWidgets/WBP_CampCameraControls"));
-
-	//Popup constructors
-	const ConstructorHelpers::FClassFinder<UUserWidget> WBPSettlerPopup(TEXT("/Game/Blueprints/UserWidgets/Popups/WBP_SettlerSchedule"));
-	const ConstructorHelpers::FClassFinder<UUserWidget> WBPSelectResidence(TEXT("/Game/Blueprints/UserWidgets/Popups/WBP_SelectResidencePopup"));
-	const ConstructorHelpers::FClassFinder<UUserWidget> WBPSelectWork(TEXT("/Game/Blueprints/UserWidgets/Popups/WBP_SelectWorkPopup"));
-	const ConstructorHelpers::FClassFinder<UUserWidget> WBPAccept(TEXT("/Game/Blueprints/UserWidgets/Popups/WBP_Accept"));
-
-	//Helpers
-	const ConstructorHelpers::FClassFinder<UUserWidget> WBPCustomOverlay(TEXT("/Game/Blueprints/UserWidgets/WBP_CustomOverlay"));
-
-
-
-	//Main 
-	LooseCameraUserWidget = WBPControlsLooseCamera.Class;
-	SettlerInfoUserWidget = WBPSettlersInfoUserWidget.Class;
-	CampControlClass = WBPControlsCamp.Class;
-
-	//Popups
-	SettlerSchedulePopup = WBPSettlerPopup.Class;
-	SelectWorkPopup = WBPSelectWork.Class;
-	SelectResidencePopup = WBPSelectResidence.Class;
-	AcceptPopup = WBPAccept.Class;
-
-	//Helpers
-	CustomOverlay = WBPCustomOverlay.Class;
-
-	//Small elements
-	const ConstructorHelpers::FClassFinder<UUserWidget> WBPSelectBuildingIcons(TEXT("/Game/Blueprints/UserWidgets/SmallElements/WBP_SelectBuildingIcons"));
-	SelectBuildingIcons = WBPSelectBuildingIcons.Class;
-	const ConstructorHelpers::FClassFinder<UUserWidget> WBPButtonGatherResource(TEXT("/Game/Blueprints/UserWidgets/SmallElements/WBP_SelectWorkFind"));
-	ButtonGatherResource = WBPButtonGatherResource.Class;
-	const ConstructorHelpers::FClassFinder<UUserWidget> WBPButtonWorkBuilding(TEXT("/Game/Blueprints/UserWidgets/SmallElements/WBP_SelectWorkBuilding"));
-	ButtonWorkBuilding = WBPButtonWorkBuilding.Class;
-
-
+	//-----------------------------------
+	// Class finders
+	//-----------------------------------
 	
+	//Controls
+	const ConstructorHelpers::FClassFinder<UUserWidget> WBPLooseCameraControlsWidget(TEXT("/Game/Blueprints/UserWidgets/Controls/WBP_LooseCameraControlsWidget"));
+	const ConstructorHelpers::FClassFinder<UUserWidget> WBPCampCameraControlsWidget(TEXT("/Game/Blueprints/UserWidgets/Controls/WBP_CampCameraControlsWidget"));
+	const ConstructorHelpers::FClassFinder<UUserWidget> WBPBattleCameraControlsWidget(TEXT("/Game/Blueprints/UserWidgets/Controls/WBP_BattleCameraControlsWidget"));
+
+
+	//Settler informations
+	const ConstructorHelpers::FClassFinder<UUserWidget> WBPSettlerInformationWidget(TEXT("/Game/Blueprints/UserWidgets/SettlerInformation/WBP_SettlerInformationWidget"));
+
+	//Settler informations -> Popus
+	const ConstructorHelpers::FClassFinder<UUserWidget> WBPScheduleSettingsWidget(TEXT("/Game/Blueprints/UserWidgets/SettlerInformation/Popups/WBP_ScheduleSettingsWidget"));
+	const ConstructorHelpers::FClassFinder<UUserWidget> WBPSelectResidenceWidget(TEXT("/Game/Blueprints/UserWidgets/SettlerInformation/Popups/WBP_SelectResidenceWidget"));
+	const ConstructorHelpers::FClassFinder<UUserWidget> WBPSelectWorkWidget(TEXT("/Game/Blueprints/UserWidgets/SettlerInformation/Popups/WBP_SelectWorkWidget"));
+	
+	//Settler informations -> Entries
+	const ConstructorHelpers::FClassFinder<UUserWidget> WBPWorkplaceEntryWidget(TEXT("/Game/Blueprints/UserWidgets/SettlerInformation/Entries/WBP_WorkplaceEntryWidget"));
+	const ConstructorHelpers::FClassFinder<UUserWidget> WBPResidenceEntryWidget(TEXT("/Game/Blueprints/UserWidgets/SettlerInformation/Entries/WBP_ResidenceEntryWidget"));
+	const ConstructorHelpers::FClassFinder<UUserWidget> WBPGatherTaskEntryWidget(TEXT("/Game/Blueprints/UserWidgets/SettlerInformation/Entries/WBP_GatherTaskEntryWidget"));
+	
+	//Universal
+
+	//Universal -> Popups
+	const ConstructorHelpers::FClassFinder<UUserWidget> WBPConfirmationPopupWidget(TEXT("/Game/Blueprints/UserWidgets/Universal/Popups/WBP_ConfirmationPopupWidget"));
+
+	//Universal -> Components
+	const ConstructorHelpers::FClassFinder<UUserWidget> WBPBlackOverlayWidget(TEXT("/Game/Blueprints/UserWidgets/Universal/Components/WBP_BlackOverlayWidget"));
+
+
+
+	//-----------------------------------
+	// Setup classes
+	//-----------------------------------
+	
+	//Controls
+	LooseCameraControlsWidget = WBPLooseCameraControlsWidget.Class;
+	CampCameraControlsWidget = WBPCampCameraControlsWidget.Class;
+	BattleCameraControlsWidget = WBPBattleCameraControlsWidget.Class;
+
+	//Settler informations
+	SettlerInformationWidget = WBPSettlerInformationWidget.Class;
+	
+	//Settler informations -> Popus
+	ScheduleSettingsWidget = WBPScheduleSettingsWidget.Class;
+	SelectResidenceWidget = WBPSelectResidenceWidget.Class;
+	SelectWorkWidget = WBPSelectWorkWidget.Class;
+
+	//Settler informations -> Entries
+	WorkplaceEntryWidget = WBPWorkplaceEntryWidget.Class;
+	ResidenceEntryWidget = WBPResidenceEntryWidget.Class;
+	GatherTaskEntryWidget = WBPGatherTaskEntryWidget.Class;
+	
+	//Universal
+
+	//Universal -> Popups
+	ConfirmationPopupWidget = WBPConfirmationPopupWidget.Class;
+
+	//Universal -> Components
+	BlackOverlayWidget = WBPBlackOverlayWidget.Class;
+
+
+
 }
 // Called when the game starts
 void UUIController::BeginPlay()
@@ -66,67 +86,59 @@ void UUIController::BeginPlay()
 	Super::BeginPlay();
 }
 
-
 void UUIController::UpdateUI(ECurrentUI NewCurrentUI)
 {
+	
 	PlayerController = Cast<ANorthernCampPlayerController>(GetOwner());
 	CurrentUI = NewCurrentUI;
 
-	if(PlayerController)
+	if (PlayerController)
 	{
-
-		//Make it go slower so you can reset the settings?
-
-		if(MainUI){MainUI->RemoveFromViewport();}
+		if (MainUI) { MainUI->RemoveFromViewport(); }
 		bIsInMenu = false;
 		CurrentScrollBar = nullptr;
-		if(NewCurrentUI == ECurrentUI::SettlerInfo)
+		if (NewCurrentUI == ECurrentUI::SettlerInfo)
 		{
-			MainUI = CreateWidget<UUserWidget>(PlayerController, SettlerInfoUserWidget, FName("Settler Information Widget"));
-			CurrentScrollBar = Cast<UScrollBox>(Cast<USettlerInfoUserWidget>(MainUI)->ScrollboxWholeWindow);
+			MainUI = CreateWidget<UUserWidget>(PlayerController, SettlerInformationWidget, FName("Settler Information Widget"));
+			CurrentScrollBar = Cast<UScrollBox>(Cast<USettlerInformationWidget>(MainUI)->ScrollboxWholeWindow);
 			bIsInMenu = true;
-
-
 		}
-		else if(NewCurrentUI == ECurrentUI::LooseCamera)
+		else if (NewCurrentUI == ECurrentUI::LooseCamera)
 		{
-			MainUI = CreateWidget<UUserWidget>(PlayerController, LooseCameraUserWidget, FName("Main Loose Camera Main UI"));
+			MainUI = CreateWidget<UUserWidget>(PlayerController, LooseCameraControlsWidget, FName("Main Loose Camera Main UI"));
 		}
-		else if(NewCurrentUI == ECurrentUI::Camp)
+		else if (NewCurrentUI == ECurrentUI::Camp)
 		{
-			MainUI = CreateWidget<UUserWidget>(PlayerController, CampControlClass, FName("Camp Main UI"));
+			MainUI = CreateWidget<UUserWidget>(PlayerController, CampCameraControlsWidget, FName("Camp Main UI"));
 		}
 
-		
+
 		MainUI->AddToViewport();
 		PlayerController->ResetControlls();
-		
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Cast failed for player controller in UI Controller"));
 	}
-
 }
 void UUIController::DisplayPopup(EPopup NewPopup)
 {
 
-	Overlay = CreateWidget<UUserWidget>(PlayerController, CustomOverlay, FName("Overlay for popups"));
+	Overlay = CreateWidget<UUserWidget>(PlayerController, BlackOverlayWidget, FName("Overlay for popups"));
 	Overlay->AddToViewport();
 
-	
 	if(NewPopup == EPopup::SettlerSchedule)
 	{
-		Popup = CreateWidget<UUserWidget>(PlayerController, SettlerSchedulePopup, FName("Select schedule popup"));
+		Popup = CreateWidget<UUserWidget>(PlayerController, ScheduleSettingsWidget, FName("Select schedule popup"));
 	}
 	else if(NewPopup == EPopup::SelectWork)
 	{
-		Popup = CreateWidget<UUserWidget>(PlayerController, SelectWorkPopup, FName("Select work popup"));
+		Popup = CreateWidget<UUserWidget>(PlayerController, SelectWorkWidget, FName("Select work popup"));
 	}
 	
 	else if(NewPopup == EPopup::SelectResidence)
 	{
-		Popup = CreateWidget<UUserWidget>(PlayerController, SelectResidencePopup, FName("Select residence popup"));
+		Popup = CreateWidget<UUserWidget>(PlayerController, SelectResidenceWidget, FName("Select residence popup"));
 	}
 	
 	bIsInMenu = true;
@@ -144,7 +156,7 @@ void UUIController::RemovePopup(EPopup PopupToRemove)
 	if(Popup)
 	{
 		Popup->RemoveFromViewport();
-		Popup->Destruct();
+		//Popup->Destruct();
 		PlayerController->ResetControlls();
 		if(MainUI)
 		{

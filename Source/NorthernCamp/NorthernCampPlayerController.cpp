@@ -4,17 +4,15 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
-#include "NorthernCamp/UserWidgets/SettlerInfoUserWidget.h"
+
 #include "Blueprint/UserWidget.h"
 #include "NorthernCamp/Pawns/LooseCameraPawn.h"
 #include "NorthernCamp/Pawns/CampCameraPawn.h"
 #include "NorthernCamp/Characters/CharacterHero.h"
 #include "NorthernCamp/Characters/CharacterSettler.h"
 #include "Math/UnrealMathUtility.h"
-#include "Components/ScrollBox.h"
- 	
 
-#include "Engine/World.h"
+
 #include "EngineUtils.h"
 #include "NavigationSystem.h"
 
