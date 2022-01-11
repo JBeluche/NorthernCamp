@@ -25,10 +25,20 @@ private:
 
 	ANorthernCampPlayerController* PlayerController;
 	UUserWidget* WidgetINeed;
+	UUserWidget* AcceptPopupWidget;
 
 	UPROPERTY(meta = (BindWidget))
 	UButton* B_QuitPopup;
-
+	
+	UPROPERTY(meta = (BindWidget))
+	UButton* B_Clear;
+	
 	UFUNCTION()
 	void Exit();
+
+	UFUNCTION()
+	void OpenAcceptPopup();
+
+	UFUNCTION()
+	void ClearResidence();
 };

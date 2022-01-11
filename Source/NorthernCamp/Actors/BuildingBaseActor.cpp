@@ -40,7 +40,6 @@ void ABuildingBaseActor::BeginPlay()
 	}
 	for (UWorkingSpot* CompIt :  WorkingSpotscomponents)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Has found a working spot"));
 		WorkingSpots.Emplace(Cast<UWorkingSpot>(CompIt), nullptr);
 	}
 }
@@ -118,8 +117,6 @@ TArray<UWorkingSpot*> ABuildingBaseActor::GetFreeWorkingSpot()
 	{
 		if(Pair.Value == nullptr)
 		{
-			UE_LOG(LogTemp, Error, TEXT("Has found a working spot that is free"));
-
 			FreeWorkingSpots.Add(Pair.Key);
 		}
 	}

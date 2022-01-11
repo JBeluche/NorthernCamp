@@ -12,9 +12,10 @@
 #include "Components/UniformGridPanel.h"
 #include "Components/UniformGridSlot.h"
 #include "NorthernCamp/NorthernCampPlayerController.h"
+#include "NorthernCamp/UserWidgets/SettlerInformations/SettlerInformationWidget.h"
 #include "NorthernCamp/UserWidgets/SettlerInformations/Entries/GatherTaskEntryWidget.h"
 #include "NorthernCamp/UserWidgets/SettlerInformations/Entries/WorkplaceEntryWidget.h"
-
+#include "NorthernCamp/UserWidgets/Universal/Popups/ConfirmationPopupWidget.h"
 
 
 bool USelectWorkWidget::Initialize()
@@ -28,6 +29,7 @@ void USelectWorkWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 
+
 	for (FConstPlayerControllerIterator iter = GetWorld()->GetPlayerControllerIterator(); iter; ++iter)
 	{
 		PlayerController = Cast<ANorthernCampPlayerController>(*iter);
@@ -37,7 +39,20 @@ void USelectWorkWidget::NativeConstruct()
 		return;
 	}
 
+	//Dynamic functions
+	B_Clear->OnClicked.AddDynamic(this, &USelectWorkWidget::OpenAcceptPopup);
 	B_QuitPopup->OnClicked.AddDynamic(this, &USelectWorkWidget::Exit);
+	
+	//Check if you need to display de clear button
+	if(PlayerController->SelectedSettler->CurrentWork.WorkType != EWorkType::None)
+	{
+		B_Clear->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		B_Clear->SetVisibility(ESlateVisibility::Hidden);
+	}
+	
 
 	UGP_GatherResource->ClearChildren();
 
@@ -77,17 +92,12 @@ void USelectWorkWidget::AddBuildingsWithWorkButtons()
 		if(PlayerController->SelectedSettler->CurrentWork.WorkBuilding)
 		{
 			UE_LOG(LogTemp, Error, TEXT("Settler building: %s, Found building: %s"), *PlayerController->SelectedSettler->CurrentWork.WorkBuilding->GetName(), *Building->GetName());
-
 		}
 		
 		if(PlayerController->SelectedSettler->CurrentWork.WorkBuilding != Building)
 		{
-			UE_LOG(LogTemp, Error, TEXT("is not the smae building"));
 			if(ActorItr->GetFreeWorkingSpot().Num() >= 1)
 			{
-				UE_LOG(LogTemp, Error, TEXT("Has free spots!"));
-
-				
 				if(ColumnNumber >= 3)
 				{
 					ColumnNumber = 0;
@@ -166,3 +176,36 @@ void USelectWorkWidget::Exit()
 	PlayerController->UIController->RemovePopup(EPopup::SelectWork);
 }
 
+void USelectWorkWidget::OpenAcceptPopup()
+{
+	AcceptPopupWidget = WidgetTree->ConstructWidget<UUserWidget>(PlayerController->UIController->ConfirmationPopupWidget);
+	
+	if(AcceptPopupWidget != nullptr)
+	{
+		AcceptPopupWidget->AddToViewport();
+
+		UConfirmationPopupWidget* AcceptPopup = Cast<UConfirmationPopupWidget>(AcceptPopupWidget);
+		if(AcceptPopup)
+		{
+			AcceptPopup->B_Accept->OnClicked.AddDynamic(this, &USelectWorkWidget::ClearWork);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("could not cast to accept popup!"));
+		}
+	}
+}
+
+void USelectWorkWidget::ClearWork()
+{
+
+	PlayerController->SelectedSettler->ResetCurrentWork();
+
+	//Update ui
+	USettlerInformationWidget* InfoUserWidget = Cast<USettlerInformationWidget>(PlayerController->UIController->MainUI);
+	InfoUserWidget->RefreshSettlerInfo();
+	
+	PlayerController->UIController->RemovePopup(EPopup::SelectWork);
+	AcceptPopupWidget->RemoveFromViewport();
+}
+	

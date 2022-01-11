@@ -62,12 +62,14 @@ void UWorkplaceEntryWidget::Accepted()
 	{
 		UE_LOG(LogTemp, Error, TEXT("Could not add inhabitant using the select building button!"));
 	}
-	//Update ui
-	USettlerInformationWidget* InfoUserWidget = Cast<USettlerInformationWidget>(PlayerController->UIController->MainUI);
-	InfoUserWidget->RefreshSettlerInfo();
+
 	
 	PlayerController->SelectedSettler->CurrentWork.WorkBuilding = Building;
 	PlayerController->SelectedSettler->CurrentWork.WorkType = EWorkType::Building;
+
+	//Update ui
+	USettlerInformationWidget* InfoUserWidget = Cast<USettlerInformationWidget>(PlayerController->UIController->MainUI);
+	InfoUserWidget->RefreshSettlerInfo();
 	
 	PlayerController->UIController->RemovePopup(EPopup::SelectWork);
 	AcceptPopupWidget->RemoveFromViewport();

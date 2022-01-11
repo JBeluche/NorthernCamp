@@ -115,7 +115,6 @@ void USettlerInformationWidget::OpenSelectWorkPopup()
 void USettlerInformationWidget::RefreshSettlerInfo()
 {
 	//TODO Remove the use of resource to display the icon. You should have global stuff to display globally used icons like an "x".
-
 	
 	T_Work->SetText(FText::FromString(TEXT("No work")));
 	FResourceTypeInfo ResourceInfoNone =  PlayerController->ResourceController->ResourcesInfoMap[EResourceType::None];
@@ -140,20 +139,18 @@ void USettlerInformationWidget::RefreshSettlerInfo()
 	{
 		FText BuildingName = Settler->CurrentWork.WorkBuilding->BuildingName;
 				
-		FText AditionalText = FText::FromString("Working at: /n");
+		FText AditionalText = FText::FromString("Working at:");
 				
 		FText TextToSet = FText::Format(AditionalText, BuildingName);
-		T_Work->SetText(TextToSet);
+		T_Work->SetText(BuildingName);
 		IMG_Work->SetBrush(Settler->CurrentWork.WorkBuilding->BuildingIcon);
+
 	}
 
-	UE_LOG(LogTemp, Error, TEXT("When through here"));
 
 	//Residence
 	if(Settler->CurrentResidence != nullptr)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Not a nullptr"));
-
 		T_Residence->SetText(Settler->CurrentResidence->BuildingName);
 		IMG_Residence->SetBrush(Settler->CurrentResidence->BuildingIcon);
 	}

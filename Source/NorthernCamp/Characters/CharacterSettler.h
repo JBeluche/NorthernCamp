@@ -87,7 +87,7 @@ public:
 	bool PutResourceInHand(EResourceType ResourceType, int32 Amount);
 
 	void ResetCurrentWork();
-
+	void ResetCurrentResidence();
 	ADayNightActorController* DayNightActorController;
 	
 	UFUNCTION() 

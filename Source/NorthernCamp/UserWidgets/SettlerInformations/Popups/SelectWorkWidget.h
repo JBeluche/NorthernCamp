@@ -24,7 +24,6 @@ private:
 	void AddGatherResourceButtons();
 	void AddBuildingsWithWorkButtons();
 
-
 	UPROPERTY(meta = (BindWidget))
 	UUniformGridPanel* UGP_GatherResource;
 
@@ -34,10 +33,20 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UButton* B_QuitPopup;
 
+	UPROPERTY(meta = (BindWidget))
+	UButton* B_Clear;
+
 	ANorthernCampPlayerController* PlayerController;
 	UUserWidget* WidgetINeed;
 	AResourceController* ResourceController;
+	UUserWidget* AcceptPopupWidget;
 
 	UFUNCTION()
 	void Exit();
+
+	UFUNCTION()
+	void OpenAcceptPopup();
+
+	UFUNCTION()
+	void ClearWork();
 };

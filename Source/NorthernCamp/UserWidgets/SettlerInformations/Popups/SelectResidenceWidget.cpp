@@ -11,8 +11,9 @@
 #include "Components/UniformGridSlot.h"
 #include "NorthernCamp/NorthernCampPlayerController.h"
 #include "NorthernCamp/Actors/BuildingBaseActor.h"
+#include "NorthernCamp/UserWidgets/SettlerInformations/SettlerInformationWidget.h"
 #include "NorthernCamp/UserWidgets/SettlerInformations/Entries/ResidenceEntryWidget.h"
-
+#include "NorthernCamp/UserWidgets/Universal/Popups/ConfirmationPopupWidget.h"
 
 
 bool USelectResidenceWidget::Initialize()
@@ -27,6 +28,7 @@ void USelectResidenceWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 
+	
 	for (FConstPlayerControllerIterator iter = GetWorld()->GetPlayerControllerIterator(); iter; ++iter)
 	{
 		PlayerController = Cast<ANorthernCampPlayerController>(*iter);
@@ -36,6 +38,18 @@ void USelectResidenceWidget::NativeConstruct()
 		return;
 	}
 
+	B_Clear->OnClicked.AddDynamic(this, &USelectResidenceWidget::OpenAcceptPopup);
+	//Check if you need to display de clear button
+	if(PlayerController->SelectedSettler->CurrentResidence != nullptr)
+	{
+		B_Clear->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		B_Clear->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+		
 	B_QuitPopup->OnClicked.AddDynamic(this, &USelectResidenceWidget::Exit);
 
 
@@ -85,4 +99,36 @@ void USelectResidenceWidget::Exit()
 	PlayerController->UIController->RemovePopup(EPopup::SelectResidence);
 }
 
+void USelectResidenceWidget::OpenAcceptPopup()
+{
+	AcceptPopupWidget = WidgetTree->ConstructWidget<UUserWidget>(PlayerController->UIController->ConfirmationPopupWidget);
+	
+	if(AcceptPopupWidget != nullptr)
+	{
+		AcceptPopupWidget->AddToViewport();
 
+		UConfirmationPopupWidget* AcceptPopup = Cast<UConfirmationPopupWidget>(AcceptPopupWidget);
+		if(AcceptPopup)
+		{
+			AcceptPopup->B_Accept->OnClicked.AddDynamic(this, &USelectResidenceWidget::ClearResidence);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("could not cast to accept popup!"));
+		}
+	}
+}
+
+
+void USelectResidenceWidget::ClearResidence()
+{
+	PlayerController->SelectedSettler->ResetCurrentResidence();
+
+	//Update ui
+	USettlerInformationWidget* InfoUserWidget = Cast<USettlerInformationWidget>(PlayerController->UIController->MainUI);
+	InfoUserWidget->RefreshSettlerInfo();
+	
+	PlayerController->UIController->RemovePopup(EPopup::SelectWork);
+	AcceptPopupWidget->RemoveFromViewport();
+}
+	

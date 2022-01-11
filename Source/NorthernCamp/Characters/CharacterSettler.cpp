@@ -128,5 +128,10 @@ void ACharacterSettler::ResetCurrentWork()
 	
 }
 
+void ACharacterSettler::ResetCurrentResidence()
+{
+	CurrentResidence->RemoveInhabitant(this);
+	CurrentResidence = nullptr;
+}
 
 
