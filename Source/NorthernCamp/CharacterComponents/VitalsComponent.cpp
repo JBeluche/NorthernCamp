@@ -29,42 +29,44 @@ void UVitalsComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetWorld()->GetTimerManager().SetTimer(UpdateVitalsTHandler, this, &UVitalsComponent::UpdateVitals, TimeIntervalVitalsCheck, true);
-
-	CurrentWaterMeter = 100.0f;
+	CurrentWaterMeter = 0.0f;
 	CurrentFoodMeter = 100.0f;
 	CurrentSleepMeter = 100.0f;
 	CurrentFunFireMeter = 100.0f;
+	WaterIsLowThreshold = 10.0f;
 	
 	Owner = Cast<ACharacter>(GetOwner());
+	Settler = Cast<ACharacterSettler>(GetOwner());
 	Controller = Cast<AAISettlerController>(Owner->GetController());
 
 	for (TActorIterator<ADayNightActorController> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
 		DayNightController = *ActorItr;
 	}
+
+	UpdateVitals();
+	//UE_LOG(LogTemp, Error, TEXT("VitalsComponent: begin play Settler: %s"), *GetReadableName());
+
+	GetWorld()->GetTimerManager().SetTimer(UpdateVitalsTHandler, this, &UVitalsComponent::UpdateVitals, TimeIntervalVitalsCheck, true);
+
 	
 }
 
 void UVitalsComponent::UpdateVitals()
 {
-
-
-	if(Controller == nullptr)
-	{
-		UE_LOG(LogTemp, Error, TEXT("You have the wrong ai setup for a settler, he cant look for resources"));
-		return;
-	}
+	if(Controller == nullptr){UE_LOG(LogTemp, Error, TEXT("VitalsComponent: I dont have a controller? te fuck? Settler: %s"), *GetReadableName());	return;	}
 
 	if(DayNightController)
 	{
 
 		//////
 		// WATER
+		UE_LOG(LogTemp, Error, TEXT("VitalsComponent: Current water: %f"), CurrentWaterMeter);
 
-		if(CurrentWaterMeter < WaterIsLowThreshold)
+		if(CurrentWaterMeter <= WaterIsLowThreshold)
         {
-        	NeedWater = true;
+			NeedWater = true;
+			//RequestResourceNeed(EResourceRequest::Thirsty);
         }
 		else
 		{
@@ -80,9 +82,9 @@ void UVitalsComponent::UpdateVitals()
 		{
 			float WaterToSubtract =	(TimeIntervalVitalsCheck * WaterPercentageDecreasePerHour) / DayNightController->SecondsPerHour;
 			CurrentWaterMeter =  CurrentWaterMeter - WaterToSubtract;
-			
-
 		}
+
+		
 	
 		//////
 		// FOOD
@@ -146,4 +148,51 @@ void UVitalsComponent::UpdateVitals()
 	
 	
 
+}
+/*
+void UVitalsComponent::RequestResourceNeed(EResourceRequest Request)
+{
+
+	if(!RequestsMadeResourceNeed.Contains(Request))
+	{
+		UE_LOG(LogTemp, Error, TEXT("VitalsComponent: Adding a request"));
+
+
+		if(Request == EResourceRequest::Thirsty)
+		{
+			RequestsMadeResourceNeed.Add(Request);
+
+			FResourceInfo ResourceNeed;
+			ResourceNeed.PriorityNumber = 100;
+			ResourceNeed.ResourceType = EResourceType::Water;
+			ResourceNeed.Amount = 1;
+			Settler->ResourceManagerComp->AddResourceNeed(ResourceNeed);
+		}
+		
+	}
+}
+
+void UVitalsComponent::RequestExecuted(EResourceRequest Request)
+{
+	if(RequestsMadeResourceNeed.Contains(Request))
+	{
+		RequestsMadeResourceNeed.Remove(Request);
+
+		if(Request == EResourceRequest::Thirsty)
+		{
+			//	CurrentWaterMeter = 100.0f;
+		}
+	}
+	else{UE_LOG(LogTemp, Error, TEXT("Vitals component: You tried to RequestExecute, but the requestsmaderesourceneed array does not find you request.")); return;}
+}
+*/
+
+float UVitalsComponent::GetVitalLevel(EVital Vital)
+{
+	if(Vital == EVital::Water)
+	{
+		return CurrentWaterMeter;
+	}
+
+	return 0.0f;
 }

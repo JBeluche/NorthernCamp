@@ -22,32 +22,117 @@ void UBTS_UpdateCurrentTask::TickNode(UBehaviorTreeComponent &OwnerComp, uint8 *
 	if(!Controller){UE_LOG(LogTemp, Error, TEXT("Controller cast failed!"));return;}
 	if(!Settler){UE_LOG(LogTemp, Error, TEXT("Settler cast failed!"));return;}
 	if(Settler->VitalsComponent == nullptr){UE_LOG(LogTemp, Error, TEXT("Vitals cast failed"));return;}
-	
+
+	OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("SelfActor"), Settler);
+
+	//Drink water
+	//Eat
+	//Bring resource to work
+
+
+	//Settler is simply thirsty
 	if(Settler->VitalsComponent->NeedWater == true)
 	{
-		OwnerComp.GetBlackboardComponent()->SetValueAsEnum(GetSelectedBlackboardKey(), 1);
-		//UE_LOG(LogTemp, Error, TEXT("WATER!"));
+		TArray<FResourceInfo> NewResourcesNeeded;
+		FResourceInfo ResourceInfo;
+		ResourceInfo.Amount = 1;
+		ResourceInfo.ResourceType = EResourceType::Water;
+		NewResourcesNeeded.Add(ResourceInfo);
+		bool bWeHaveEnoughtResources = false;
+
+		for(FResourceInfo ResourceNeed : NewResourcesNeeded)
+		{
+			if(Settler->ResourceManagerComp->CheckResourceAvailability(ResourceNeed))         
+			{
+				bWeHaveEnoughtResources = true;
+			}
+			else
+			{
+				bWeHaveEnoughtResources = false;
+			}
+         
+		}
+		if(!bWeHaveEnoughtResources)
+		{
+			Settler->ResourceManagerComp->UpdateResourceNeed(NewResourcesNeeded);
+		}
+		else
+		{
+			//Settler->ResourceManagerComp->ConsumeResources(NewResourcesNeeded);
+		}
+		OwnerComp.GetBlackboardComponent()->SetValueAsEnum(GetSelectedBlackboardKey(), (uint8)ECurrentTask::FetchingResource);
+
+
+		//So what if the settler has already other resources and no room to store water?
+		//The resource need is dropped, since we don't need it anymore. For now at least.
+		//A resouce need is added for the water. Only the water is now needed.
+		//Wether you want watter or food, the choice is made in this class. Not outside of it.
+
+
+
+		
+		//IF you have water in store. Consume it. -> Set the task to consume resource
+		//IF if you already, have a resource need -> Set the task to fetch resouce
+		//ELSE Add resource need in the settler resource manager, with an id. -> Set the task to fetch resouce
+
+		
+		/* OLD
+		if(Settler->ResourceManagerComp->GetPriorityResouceNeed().ResourceType == EResourceType::Water)
+		{
+			//Settler->VitalsComponent->RequestExecuted(EResourceRequest::Thirsty);
+			Settler->ResourceManagerComp->ConsumeResource(Settler->ResourceManagerComp->GetPriorityResouceNeed());
+			Settler->ResourceManagerComp->GetPriorityResouceNeed();
+		}*/
 	}
-	else if(Settler->VitalsComponent->NeedFood == true)
+	
+
+
+
+
+
+
+	else
 	{
+		OwnerComp.GetBlackboardComponent()->SetValueAsEnum(GetSelectedBlackboardKey(), 0);
+
+	}
+
+
+	
+	//Check the CharacterSettler->CanConsumeResource. Which check the resources in hand with the resources needed to consume.
+
+
+	/*if(Settler->ResourceManagerComp->GetResourceNeed().Amount != 0)
+	{
+		//Set the consume resource task.
+		OwnerComp.GetBlackboardComponent()->SetValueAsEnum(GetSelectedBlackboardKey(), 2);
+		UE_LOG(LogTemp, Error, TEXT("Updated task to going for water!"));
+	}*/
+
+	/*else if(Settler->Character->NeedsResource == true)
+	{
+		//When the character pickups a resource he should remove the need for the resource. His need to consume it should remain. 
 		OwnerComp.GetBlackboardComponent()->SetValueAsEnum(GetSelectedBlackboardKey(), 1);
-		//UE_LOG(LogTemp, Error, TEXT("FOOD!"));
+		UE_LOG(LogTemp, Error, TEXT("Updated task to going for diner!"));
 	}
 	else if(Settler->CurrentSchedule == ESettlerSchedule::Work)
 	{
 		OwnerComp.GetBlackboardComponent()->SetValueAsEnum(GetSelectedBlackboardKey(), 2);
-		//UE_LOG(LogTemp, Error, TEXT("WORK!"));
+		UE_LOG(LogTemp, Error, TEXT("Updated task to going for WORK!"));
+
 	}
 	else if(Settler->CurrentSchedule == ESettlerSchedule::Sleep)
 	{
 		OwnerComp.GetBlackboardComponent()->SetValueAsEnum(GetSelectedBlackboardKey(), 3);
-		//UE_LOG(LogTemp, Error, TEXT("SLEEP!"));
+		UE_LOG(LogTemp, Error, TEXT("Updated task to going for SLEEP!"));
+
 	}
 	else if(Settler->CurrentSchedule == ESettlerSchedule::Leisure)
 	{
 		OwnerComp.GetBlackboardComponent()->SetValueAsEnum(GetSelectedBlackboardKey(), 4);
-		//UE_LOG(LogTemp, Error, TEXT("LEASURE!"));
-	}
+		UE_LOG(LogTemp, Error, TEXT("Updated task to going for leisure!"));
+
+	}*/
 
 	
 

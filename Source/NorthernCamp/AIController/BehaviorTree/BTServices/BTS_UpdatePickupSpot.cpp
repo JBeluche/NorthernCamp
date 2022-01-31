@@ -18,22 +18,15 @@ void UBTS_UpdatePickupSpot::TickNode(UBehaviorTreeComponent &OwnerComp, uint8 *N
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-	AActor* Actor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PickupActor")));
-	bool StillHasWater = false;
+	//Get the ActorWithResource and check if the pickup spot is still his. Reset all values if it is'nt. Update the values if it is.
 
-	//UResourceManagerComponent* ResourceManagerComp = Cast<UResourceManagerComponent>(Actor->GetComponentByClass(TSubclassOf<UResourceManagerComponent> ComponentClass));
+	AActor* Actor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("ActorWithResource")));
+
 	if(Actor)
 	{
-		UResourceManagerComponent* ResourceManagerComp = Cast<UResourceManagerComponent>(Actor->GetComponentByClass(UResourceManagerComponent::StaticClass()));
-		if(ResourceManagerComp)
-		{
-			StillHasWater = ResourceManagerComp->CheckResourceAvailability(EResourceType::Water,1 );
-		}
-	}
-	
-	if(StillHasWater)
-	{
 		UResourcesPickupSpot* PickupComponent = Cast<UResourcesPickupSpot>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PickupComponent")));
+
+		
 		
 		if(PickupComponent)
 		{
@@ -42,7 +35,6 @@ void UBTS_UpdatePickupSpot::TickNode(UBehaviorTreeComponent &OwnerComp, uint8 *N
 			{
 				OwnerComp.GetBlackboardComponent()->ClearValue(TEXT("PickupComponent"));
 				OwnerComp.GetBlackboardComponent()->ClearValue(TEXT("PickupLocation"));
-				OwnerComp.GetBlackboardComponent()->ClearValue(TEXT("PickupActor"));
 			}
 			else
 			{
@@ -56,8 +48,4 @@ void UBTS_UpdatePickupSpot::TickNode(UBehaviorTreeComponent &OwnerComp, uint8 *N
 		OwnerComp.GetBlackboardComponent()->ClearValue(TEXT("PickupLocation"));
 		OwnerComp.GetBlackboardComponent()->ClearValue(TEXT("PickupActor"));
 	}
-
-	//Reset the current location of the pickupspot for if it is moving it changes.
-	
-
 }

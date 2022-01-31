@@ -11,7 +11,8 @@ ADrinkingPlaceActor::ADrinkingPlaceActor()
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 	SetRootComponent(SceneComponent);
 	ResourceManagerComp = CreateDefaultSubobject<UResourceManagerComponent>(TEXT("Resource Manager"));
-	ResourceManagerComp->AddEndlessResource(EResourceType::Water);
+
+	
 
 }
 
@@ -19,6 +20,9 @@ ADrinkingPlaceActor::ADrinkingPlaceActor()
 void ADrinkingPlaceActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ResourceManagerComp->AddEndlessResource(EResourceType::Water);
+
 	
 }
 

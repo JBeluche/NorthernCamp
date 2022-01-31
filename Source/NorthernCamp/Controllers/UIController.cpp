@@ -45,8 +45,13 @@ UUIController::UUIController()
 	//Universal -> Components
 	const ConstructorHelpers::FClassFinder<UUserWidget> WBPBlackOverlayWidget(TEXT("/Game/Blueprints/UserWidgets/Universal/Components/WBP_BlackOverlayWidget"));
 
+	//Resouces Information
+
+	//Resouces Information -> Entries
+	const ConstructorHelpers::FClassFinder<UUserWidget> WBPResourceCounterEntryWidget(TEXT("/Game/Blueprints/UserWidgets/CampInformation/Entries/WBP_ResourceCounterEntryWidget"));
 
 
+	
 	//-----------------------------------
 	// Setup classes
 	//-----------------------------------
@@ -77,7 +82,10 @@ UUIController::UUIController()
 	//Universal -> Components
 	BlackOverlayWidget = WBPBlackOverlayWidget.Class;
 
+	//Resouces Information
 
+	//Resouces Information -> Entries
+	ResourceCounterEntryWidget = WBPResourceCounterEntryWidget.Class;
 
 }
 // Called when the game starts

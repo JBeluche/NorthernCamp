@@ -37,7 +37,7 @@ private:
 	UButton* B_Clear;
 
 	ANorthernCampPlayerController* PlayerController;
-	UUserWidget* WidgetINeed;
+	UUserWidget* EntryWidget;
 	AResourceController* ResourceController;
 	UUserWidget* AcceptPopupWidget;
 

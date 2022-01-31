@@ -20,39 +20,46 @@ EBTNodeResult::Type UBTT_PickupResource::ExecuteTask(UBehaviorTreeComponent& Own
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	//Cast the box component
-	UResourcesPickupSpot* PickupSpot = Cast<UResourcesPickupSpot>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PickupComponent")));
-	AActor* Actor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PickupActor")));
-
 	
+	//Cast the box component
+	AActor* ActorWithResource = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("ActorWithResource")));
 
-	bool PickedResource = false;
 
-	if(PickupSpot && Actor)
+	if(ActorWithResource)
 	{
 		AAISettlerController* Controller = Cast<AAISettlerController>(OwnerComp.GetAIOwner());
 		ACharacterSettler* Settler = Cast<ACharacterSettler>(Controller->GetPawn());
 		ACharacter* Character = Cast<ACharacter>(Controller->GetPawn());
 
-		UResourceManagerComponent* ResourceManagerComp = Cast<UResourceManagerComponent>(Actor->GetComponentByClass(UResourceManagerComponent::StaticClass()));
+		UResourceManagerComponent* ResourceManagerComp = Cast<UResourceManagerComponent>(ActorWithResource->GetComponentByClass(UResourceManagerComponent::StaticClass()));
 
 		
 		if(ResourceManagerComp && Character)
 		{
-			PickedResource = ResourceManagerComp->ExtractRersouce(Settler->ResourceManagerComp->GetResourceNeed().ResourceType, Settler->ResourceManagerComp->GetResourceNeed().Amount, Character);
-		}
-
-		if(PickedResource)
-		{
-
-			//Add to settlers hand
-			Settler->PutResourceInHand(Settler->ResourceManagerComp->GetResourceNeed().ResourceType, Settler->ResourceManagerComp->GetResourceNeed().Amount);
-			OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bResourcePicked"), true);
+			if(Settler->ResourceManagerComp->GetCurrentResoucesToFetch().ResourceType == EResourceType::None)
+			{
+				UE_LOG(LogTemp, Error, TEXT("UBTT_PickupResource: I want to extract a resource but cannot find my priority need"));
+				return EBTNodeResult::Failed;
+			}
 			
-			return EBTNodeResult::Succeeded;
-		}
-		
+			bool bResourceAvailable = ResourceManagerComp->CheckResourceAvailability(Settler->ResourceManagerComp->GetCurrentResoucesToFetch());
+			if(bResourceAvailable)
+			{
+				bool bTransferSuccesfull = ResourceManagerComp->TransferResources(Settler->ResourceManagerComp->GetCurrentResoucesToFetch(), Settler->ResourceManagerComp);
 
+				if(bTransferSuccesfull)
+				{
+					UE_LOG(LogTemp, Error, TEXT("UBTT_PickupResource: Transfer succesfull"));
+
+					return EBTNodeResult::Succeeded;
+				}
+			}
+			}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("UBTT_PickupResource: Nullpt ResourceManagerComp && Character "));
+			return EBTNodeResult::Failed;
+		}
 	}
 
 	return EBTNodeResult::Failed;

@@ -34,8 +34,8 @@ void ACartBaseActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	ResourceManagerComp->AddResource(EResourceType::Water, StartingWater);
-	ResourceManagerComp->AddResource(EResourceType::Food, StartingFood);
+//	ResourceManagerComp->AddResource(EResourceType::Water, StartingWater);
+	//ResourceManagerComp->AddResource(EResourceType::Food, StartingFood);
 
 }
 

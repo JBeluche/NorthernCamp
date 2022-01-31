@@ -4,6 +4,8 @@
 #include "NorthernCamp/Characters/CharacterSettler.h"
 
 #include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
+#include "NorthernCamp/NorthernCampGameMode.h"
 #include "NorthernCamp/CharacterComponents/VitalsComponent.h"
 
 
@@ -13,16 +15,29 @@ ACharacterSettler::ACharacterSettler()
 	ResourceManagerComp = CreateDefaultSubobject<UResourceManagerComponent>(TEXT("Resource Manager"));
 
 
+
 }
 void ACharacterSettler::BeginPlay()
 {
 	Super::BeginPlay();
 
 
-	for (TActorIterator<ADayNightActorController> ActorItr(GetWorld()); ActorItr; ++ActorItr) 
-	{ 
-		DayNightActorController = Cast<ADayNightActorController>(*ActorItr); 
-	}
+	//Get day night controller from game mode
+	DayNightActorController =  Cast<ANorthernCampGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->DayNightController;
+	ResourceManagerComp->StorageOwnerType = EStorageOwnerType::Character;
+	
+	//Setting up settings
+	//Adding hands
+	FResourceInfo ResourceInfo;
+	ResourceInfo.ResourceType = EResourceType::All;
+	ResourceInfo.Amount = 1;
+
+	TArray<FResourceInfo> StorableResouces;
+	StorableResouces.Add(ResourceInfo);
+	
+	ResourceManagerComp->AddStorage(FName("Left Hand"), StorableResouces);
+	ResourceManagerComp->AddStorage(FName("Right Hand"), StorableResouces);
+
 	
 	if(DayNightActorController) 
 	{ 
@@ -67,11 +82,7 @@ UVitalsComponent* ACharacterSettler::GetCharacterVitalsComponent()
 
 bool ACharacterSettler::DrinkWater(float Amount)
 {
-	if(VitalsComponent)
-	{
-		VitalsComponent->CurrentWaterMeter = Amount;
-		return true;
-	}
+	
 
 	return false;
 }
@@ -133,5 +144,10 @@ void ACharacterSettler::ResetCurrentResidence()
 	CurrentResidence->RemoveInhabitant(this);
 	CurrentResidence = nullptr;
 }
+/*
+void ACharacterSettler::DoesCharacterNeedResource()
+{
+	
+}*/
 
 

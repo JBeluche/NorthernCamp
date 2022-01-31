@@ -12,14 +12,16 @@
 #include "AISettlerController.generated.h"
 
 
-UENUM(BlueprintType)
+UENUM()
 enum class ECurrentTask : uint8 
 {
-	Diner UMETA(DisplayName = "Diner"),
-	GettingFood UMETA(DisplayName = "Getting Food"),
-	GoingToWork UMETA(DisplayName = "Going to Work"),
-	GoingToSleep UMETA(DisplayName = "Going to Sleep"),
-	GoingToCampfire UMETA(DisplayName = "Going to Campfire"),
+	Frozen UMETA(DisplayName = "Frozen"),
+	ConsumeResource UMETA(DisplayName = "ConsumeResource"),
+	FetchingResource UMETA(DisplayName = "FetchingResource"),
+	Work UMETA(DisplayName = "Work"),
+	Sleep UMETA(DisplayName = "Sleep"),
+	HaveFun UMETA(DisplayName = "HaveFun"),
+
 };
 
 
@@ -34,19 +36,19 @@ class NORTHERNCAMP_API AAISettlerController : public AAIControllerBase
 
 	AAISettlerController();
 	
-		ACharacterSettler* CharacterOwner;
+	ACharacterSettler* CharacterOwner;
 
-		virtual void BeginPlay() override;
+	virtual void BeginPlay() override;
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UBehaviorTree* BehaviorTree;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UBehaviorTree* BehaviorTree;
 
-		ADayNightActorController* DayNightActorController;
+	ADayNightActorController* DayNightActorController;
 
-		UFUNCTION()
-		void HourStruck(float CurrentHour);
-		//Water
-		void WaterIsLow();
+	UFUNCTION()
+	void HourStruck(float CurrentHour);
+	//Water
+	void WaterIsLow();
 
 };
 

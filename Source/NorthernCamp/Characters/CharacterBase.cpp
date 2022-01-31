@@ -3,6 +3,7 @@
 
 #include "NorthernCamp/Characters/CharacterBase.h"
 
+#include "Components/CharacterCustomizationComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -10,6 +11,27 @@ ACharacterBase::ACharacterBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	//This was needed to generated a SKMESH using modular character
+	Mask = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mask"));
+	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+
+	Mask->SetupAttachment(RootComponent);
+	SkeletalMesh->SetupAttachment(Mask);
+
+	//Because the charater mesh always looks the wrong way and is to high
+	FRotator NewRotation = SkeletalMesh->GetComponentRotation();
+	NewRotation.Yaw = SkeletalMesh->GetComponentRotation().Yaw - 90.0f;
+	FVector NewPosition = SkeletalMesh->GetComponentLocation();
+	NewPosition.Z = SkeletalMesh->GetComponentLocation().Z - 90.0f;
+	
+	SkeletalMesh->SetRelativeRotation(NewRotation);
+	SkeletalMesh->SetRelativeLocation(NewPosition);
+
+	CharacterCustomizationComponent = CreateDefaultSubobject<UCharacterCustomizationComponent>(TEXT("Character Customization Component"));
+
 
 }
 
@@ -48,4 +70,9 @@ bool ACharacterBase::WithinActionRadius(AActor* Actor)
 	}
 
 	return false;
+}
+
+void ACharacterBase::SetSkeletalMesh(USkeletalMesh *GeneratedSkeletalMesh)
+{
+	SkeletalMesh->SetSkeletalMesh(GeneratedSkeletalMesh, true);
 }

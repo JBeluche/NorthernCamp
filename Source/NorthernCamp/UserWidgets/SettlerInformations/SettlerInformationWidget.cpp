@@ -43,7 +43,7 @@ bool USettlerInformationWidget::Initialize()
 			//TODO Naming not perfect!
 			RefreshSettlerInfo();
 			UpdateInfoSettler();
-			GetWorld()->GetTimerManager().SetTimer(UpdateInfoSettlerTimerHandle, this, &USettlerInformationWidget::UpdateInfoSettler, 5.0f, true);
+			GetWorld()->GetTimerManager().SetTimer(UpdateInfoSettlerTimerHandle, this, &USettlerInformationWidget::UpdateInfoSettler, 1.0f, true);
 		}
 		else
 		{
@@ -69,10 +69,14 @@ void USettlerInformationWidget::UpdateInfoSettler()
 	if(CharacterVitalsComponent)
 	{
 
-		float CurrentWaterInPercentage = (1.0f * CharacterVitalsComponent->CurrentWaterMeter) / 100.0f;
+		float CurrentWaterInPercentage = (1.0f * CharacterVitalsComponent->GetVitalLevel(EVital::Water)) / 100.0f;
+		
 		float CurrentFoodInPercentage = (1.0f * CharacterVitalsComponent->CurrentFoodMeter) / 100.0f;
 		float CurrentSleepInPercentage = (1.0f * CharacterVitalsComponent->CurrentSleepMeter) / 100.0f;
 		float CurrentFunFireInPercentage = (1.0f * CharacterVitalsComponent->CurrentFunFireMeter) / 100.0f;
+
+
+		UE_LOG(LogTemp, Error, TEXT("I just updated the info and the water was: %f, while the bar thinks its %f"), CharacterVitalsComponent->GetVitalLevel(EVital::Water), CurrentWaterInPercentage);
 
 		PB_HealthMeter->SetPercent(CurrentWaterInPercentage);
 	

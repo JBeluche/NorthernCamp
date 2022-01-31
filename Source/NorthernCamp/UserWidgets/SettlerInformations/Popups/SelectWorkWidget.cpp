@@ -104,13 +104,13 @@ void USelectWorkWidget::AddBuildingsWithWorkButtons()
 					RowNumber++;
 				}
 		
-				WidgetINeed = WidgetTree->ConstructWidget<UUserWidget>(PlayerController->UIController->WorkplaceEntryWidget);
+				EntryWidget = WidgetTree->ConstructWidget<UUserWidget>(PlayerController->UIController->WorkplaceEntryWidget);
 
 				
-				if(UUniformGridSlot* SlotToUse = UGP_WorkBuilding->AddChildToUniformGrid(WidgetINeed))
+				if(UUniformGridSlot* SlotToUse = UGP_WorkBuilding->AddChildToUniformGrid(EntryWidget))
 				{
 
-					UWorkplaceEntryWidget* WorkbuildingEntry = Cast<UWorkplaceEntryWidget>(WidgetINeed);
+					UWorkplaceEntryWidget* WorkbuildingEntry = Cast<UWorkplaceEntryWidget>(EntryWidget);
 					if(WorkbuildingEntry == nullptr){return;}
 					WorkbuildingEntry->IMG_Icon->SetBrush(ActorItr->BuildingIcon);
 					WorkbuildingEntry->TX_Name->SetText(ActorItr->BuildingName);
@@ -149,12 +149,12 @@ void USelectWorkWidget::AddGatherResourceButtons()
 					RowNumber++;
 				}
 
-				WidgetINeed = WidgetTree->ConstructWidget<UUserWidget>(PlayerController->UIController->GatherTaskEntryWidget);
+				EntryWidget = WidgetTree->ConstructWidget<UUserWidget>(PlayerController->UIController->GatherTaskEntryWidget);
 			
-				if(UUniformGridSlot* SlotToUse = UGP_GatherResource->AddChildToUniformGrid(WidgetINeed))
+				if(UUniformGridSlot* SlotToUse = UGP_GatherResource->AddChildToUniformGrid(EntryWidget))
 				{
 
-					UGatherTaskEntryWidget* ButtonGatherResource = Cast<UGatherTaskEntryWidget>(WidgetINeed);
+					UGatherTaskEntryWidget* ButtonGatherResource = Cast<UGatherTaskEntryWidget>(EntryWidget);
 					if(ButtonGatherResource == nullptr){return;}
 					ButtonGatherResource->IMG_Icon->SetBrush(ResourceController->ResourcesInfoMap[ResourceType].ResouceIcon);
 					ButtonGatherResource->TX_Name->SetText(ResourceController->ResourcesInfoMap[ResourceType].DisplayName);

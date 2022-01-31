@@ -51,6 +51,9 @@ public:
 	TSubclassOf<class UUserWidget> WorkplaceEntryWidget;
 	TSubclassOf<class UUserWidget> ResidenceEntryWidget;
 	TSubclassOf<class UUserWidget> GatherTaskEntryWidget;
+	TSubclassOf<class UUserWidget> ResourceCounterEntryWidget;
+
+	TSubclassOf<class UUserWidget> LooseCameraControlsWidget;
 
 	UUserWidget* MainUI;
 	UUserWidget* Overlay;
@@ -61,7 +64,6 @@ protected:
 	virtual void BeginPlay() override;
 
 	//Protected Varaibles 
-	TSubclassOf<class UUserWidget> LooseCameraControlsWidget;
 	TSubclassOf<class UUserWidget> CampCameraControlsWidget;
 	TSubclassOf<class UUserWidget> BattleCameraControlsWidget;
 

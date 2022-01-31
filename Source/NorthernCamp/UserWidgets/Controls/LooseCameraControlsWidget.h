@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "NorthernCamp/Actors/CartBaseActor.h"
 #include "LooseCameraControlsWidget.generated.h"
 
+class UUniformGridPanel;
 class ANorthernCampPlayerController;
 class ADayNightActorController;
 /**
@@ -33,6 +35,9 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* TB_Clock;
 
+	UPROPERTY(meta = (BindWidget))
+	UUniformGridPanel* UGP_ResoucesTotal;
+
 	FTimerHandle UpdateClockTimerHandle;
 	void SetClock();
 
@@ -58,6 +63,13 @@ private:
 	void SwitchToAlchemist();
 	UFUNCTION()
 	void SwitchToOccultist();
+	
 
 	ANorthernCampPlayerController* PlayerController;
+	UUserWidget* EntryWidget;
+	UUserWidget* ResourceEntryWidget;
+
+public:
+	void UpdateResoucesAmountDisplayed();
+
 };

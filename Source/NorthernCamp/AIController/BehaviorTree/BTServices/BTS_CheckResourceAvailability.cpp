@@ -17,11 +17,9 @@ UBTS_CheckResourceAvailability::UBTS_CheckResourceAvailability()
 
 void UBTS_CheckResourceAvailability::TickNode(UBehaviorTreeComponent &OwnerComp, uint8 *NodeMemory, float DeltaSeconds)
 {
+	/*
+	AActor* Actor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("ActorWithResource")));
 	
-	AActor* Actor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PickupActor")));
-	
-	bool bHasResources = false;
-
 	if(Actor)
 	{
 		UResourceManagerComponent* ResourceManagerComp = Cast<UResourceManagerComponent>(Actor->GetComponentByClass(UResourceManagerComponent::StaticClass()));
@@ -43,7 +41,7 @@ void UBTS_CheckResourceAvailability::TickNode(UBehaviorTreeComponent &OwnerComp,
 		OwnerComp.GetBlackboardComponent()->ClearValue(TEXT("PickupActor"));
 		OwnerComp.GetBlackboardComponent()->ClearValue(GetSelectedBlackboardKey());
 	}
-
+*/
 	
 
 

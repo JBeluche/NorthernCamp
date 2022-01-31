@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Actors/Components/ResourceManagerComponent.h"
+#include "Controllers/DayNightActorController.h"
 
 #include "GameFramework/GameModeBase.h"
 #include "NorthernCampGameMode.generated.h"
 
+class AResourceController;
 UCLASS(minimalapi)
 class ANorthernCampGameMode : public AGameModeBase
 {
@@ -19,9 +21,12 @@ public:
 	void AddResourceManager(UResourceManagerComponent* ResourceManager);
 	TArray<UResourceManagerComponent*> ResourceManagerComps;
 
+	AResourceController* ResourceController;
+	ADayNightActorController* DayNightController;
 
 
-
+protected:
+	virtual void BeginPlay() override;
 
 	
 };

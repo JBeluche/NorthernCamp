@@ -69,8 +69,8 @@ void AAISettlerController::HourStruck(float CurrentHour)
 
 void AAISettlerController::WaterIsLow()
 {
-	CharacterOwner->ResourceManagerComp->AddResourceNeed(EResourceType::Water, 1);
-	GetBlackboardComponent()->SetValueAsBool(TEXT("bIsThirsty"), true);
+	//CharacterOwner->ResourceManagerComp->AddResourceNeed(EResourceType::Water, 1);
+	//GetBlackboardComponent()->SetValueAsBool(TEXT("bIsThirsty"), true);
 }
 
 

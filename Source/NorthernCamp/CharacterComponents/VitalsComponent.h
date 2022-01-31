@@ -9,11 +9,33 @@
 #include "VitalsComponent.generated.h"
 
 
+class ACharacterSettler;
 class AAISettlerController;
+
+
+UENUM(BlueprintType)
+enum class EResourceRequest : uint8 
+{
+	Thirsty UMETA(DisplayName = "Simply Thirsty"),
+
+};
+
+UENUM(BlueprintType)
+enum class EVital : uint8 
+{
+	Water UMETA(DisplayName = "Water"),
+
+};
+
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class NORTHERNCAMP_API UVitalsComponent : public UActorComponent
 {
 	GENERATED_BODY()
+
+private:
+	float CurrentWaterMeter;
+
 
 public:	
 	// Sets default values for this component's properties
@@ -25,6 +47,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (AllowPrivateAccess = "true"))
 	float TimeIntervalVitalsCheck;
 
+	ACharacterSettler * Settler;
+	TArray<EResourceRequest> RequestsMadeResourceNeed;
+
+/*	void RequestResourceNeed(EResourceRequest RequestType);
+	void RequestExecuted(EResourceRequest Request);*/
+	float GetVitalLevel(EVital Vital);
+
+
 	//////
 	// HEALTH
 
@@ -33,7 +63,6 @@ public:
 	//////
 	// WATER
 
-	float CurrentWaterMeter;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (AllowPrivateAccess = "true"))
 	float WaterPercentageDecreasePerHour;
@@ -41,8 +70,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Water Meter")
 	float WaterIsLowThreshold;
 
-	bool NeedWater;
-	bool NeedFood;
+	bool NeedWater = false;
+	bool NeedFood  = false;
 	
 
 	//////

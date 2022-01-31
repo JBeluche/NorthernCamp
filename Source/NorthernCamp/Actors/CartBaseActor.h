@@ -20,8 +20,6 @@ public:
 	// Sex
 	ACartBaseActor();
 
-	TMap<EResourceType, int32> ResourcesStoredInCart;
-	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	USceneComponent* SceneComponent;
 
@@ -45,6 +43,7 @@ public:
 
 	TMap<UBoxComponent*, AActor*> PickupLocations;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	UResourceManagerComponent* ResourceManagerComp;
 
 protected:

@@ -21,8 +21,8 @@ void ABuildingBaseActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ResourceManagerComp->AddResource(EResourceType::Water, StartingWater);
-	ResourceManagerComp->AddResource(EResourceType::Food, StartingFood);
+	//ResourceManagerComp->AddStorage(FName("Main Storage"), EResourceType::All, 200);
+
 	
 	TInlineComponentArray<USleepingSpot*> SlepingSpotscomponents;
 	TInlineComponentArray<UWorkingSpot*> WorkingSpotscomponents;

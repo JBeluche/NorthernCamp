@@ -65,11 +65,15 @@ public:
 
 	bool bIsHero = false;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Global Settings", meta = (AllowPrivateAccess = "true"))
 	float ActionRange = 100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Vital Settings", meta = (AllowPrivateAccess = "true"))
+	float StartingWater = 100.0f;
 
 
 //Public variables
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	UResourceManagerComponent* ResourceManagerComp;
 
 	int32 WorkHoursAmount = 12;

@@ -19,20 +19,16 @@ EBTNodeResult::Type UBTT_ReservePickupSpot::ExecuteTask(UBehaviorTreeComponent& 
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
 	ACharacterSettler* Settler  = Cast<ACharacterSettler>(OwnerComp.GetAIOwner()->GetPawn());
-	
-	AActor* Actor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PickupActor")));
+	AActor* Actor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("ActorWithResource")));
 	
 	if(!Actor){return EBTNodeResult::Failed;}
 		
 	UResourceManagerComponent* ResourceManagerComp = Cast<UResourceManagerComponent>(Actor->GetComponentByClass(UResourceManagerComponent::StaticClass()));
-
-
 	UResourcesPickupSpot* PickupComponent = nullptr;
-	UResourcesPickupSpot* PreferablePickupSpot = Cast<UResourcesPickupSpot>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("PreferablePickupSpot")));
-		
+
 	if(ResourceManagerComp)
 	{
-		PickupComponent = ResourceManagerComp->ReservePickupSpot(Settler, PreferablePickupSpot);
+		PickupComponent = ResourceManagerComp->ReservePickupSpot(Settler);
 	}
 	
 	if(PickupComponent != nullptr)

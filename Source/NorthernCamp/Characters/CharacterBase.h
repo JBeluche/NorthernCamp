@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "CharacterBase.generated.h"
 
+class UCharacterCustomizationComponent;
 UCLASS()
 class NORTHERNCAMP_API ACharacterBase : public ACharacter
 {
@@ -36,4 +37,15 @@ public:
 	float ActionRadius = 200.0f;
 
 	bool WithinActionRadius(AActor* Actor);
+	void SetSkeletalMesh(USkeletalMesh* GeneratedSkeletalMesh);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	USkeletalMeshComponent* Mask;
+		
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	USkeletalMeshComponent* SkeletalMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Settings", meta = (AllowPrivateAccess = "true"))
+	UCharacterCustomizationComponent* CharacterCustomizationComponent;
+
 };
