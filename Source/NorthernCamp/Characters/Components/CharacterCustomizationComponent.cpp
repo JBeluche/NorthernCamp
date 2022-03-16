@@ -13,9 +13,19 @@ UCharacterCustomizationComponent::UCharacterCustomizationComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	
 
+	//Material insteance
+	const ConstructorHelpers::FObjectFinder<UMaterialInterface> BP_MainMaterial(TEXT("Material'/Game/_Character/ModularCharacters/Materials/ModularFantasyHeroCharacters.ModularFantasyHeroCharacters'"));
+	const ConstructorHelpers::FObjectFinder<UMaterialInterface> BP_MaskMaterial(TEXT("Material'/Game/_Character/ModularCharacters/Materials/Mask.Mask'"));
 
+	if(BP_MainMaterial.Succeeded())
+	{
+		MainMaterial = BP_MainMaterial.Object;
+	}
+	if(BP_MaskMaterial.Succeeded())
+	{
+		MaskMaterial = BP_MaskMaterial.Object;
+	}
 }
 
 
@@ -23,6 +33,8 @@ UCharacterCustomizationComponent::UCharacterCustomizationComponent()
 void UCharacterCustomizationComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	GenerateAllMaterials();
 
 	//Generate the meshes using the meshmerge function
 	
@@ -35,11 +47,13 @@ void UCharacterCustomizationComponent::BeginPlay()
 	ACharacterBase* Character = Cast<ACharacterBase>(GetOwner());
 	if(Character)
 	{
+
 		if(IsValid(GeneratedSkeletalMesh))
 		{
 			Character->SetSkeletalMesh(GeneratedSkeletalMesh);
 		}
 	}
+
 }
 
 TArray<USkeletalMesh*> UCharacterCustomizationComponent::GetAllMeshesToMerge()
@@ -85,13 +99,37 @@ TArray<USkeletalMesh*> UCharacterCustomizationComponent::GetAllMeshesToMerge()
 	return MeshesToMerge;
 }
 
+//Kinda can delete all this right? todo
+
 /* SETUP MATERIALS */
 
-void UCharacterCustomizationComponent::SetColorSkin(uint8 Value)
+void UCharacterCustomizationComponent::GenerateAllMaterials()
 {
-	ColorSkin = Value;
-}
+	ACharacterBase* Character = Cast<ACharacterBase>(GetOwner());
 
+	if(!MainMaterial){UE_LOG(LogTemp, Warning, TEXT("%s's CharacterCustomizationComponent: Material is nullptr in GenreateAllMaterials"), *Character->GetName()); return;}
+
+	DynamicMaterial = Character->SkeletalMesh->CreateDynamicMaterialInstance(0, MainMaterial);
+
+	Character->Mask->SetMaterial(0, MaskMaterial);
+
+	//Set all the colors here!
+	DynamicMaterial->SetVectorParameterValue( FName("Color_Skin"), LinearColorSkin);
+	DynamicMaterial->SetVectorParameterValue( FName("Color_Primary"), LinearColorPrimary);
+	DynamicMaterial->SetVectorParameterValue( FName("Color_Secondary"), LinearColorSecondary);
+	DynamicMaterial->SetVectorParameterValue( FName("Color_Metal_Primary"), LinearColorMetalPrimary);
+	DynamicMaterial->SetVectorParameterValue( FName("Color_Metal_Secondary"), LinearColorMetalSecondary);
+	
+	DynamicMaterial->SetVectorParameterValue( FName("Color_Stubble"), LinearColorStubble);
+	DynamicMaterial->SetVectorParameterValue( FName("Color_Scar"), LinearColorScar);
+	DynamicMaterial->SetVectorParameterValue( FName("Color_Metal_Dark"), LinearColorMetalDark);
+	DynamicMaterial->SetVectorParameterValue( FName("Color_Leather_Primary"), LinearColorLeatherPrimary);
+	DynamicMaterial->SetVectorParameterValue( FName("Color_Leather_Secondary"), LinearColorLeatherSecondary);
+	DynamicMaterial->SetVectorParameterValue( FName("Color_Hair"), LinearColorHair);
+	DynamicMaterial->SetVectorParameterValue( FName("Color_BodyArt"), LinearColorBodyArt);
+
+}
+/*
 void UCharacterCustomizationComponent::SetColorPrimary(uint8 Value)
 {
 	ColorPrimary = Value;
@@ -136,6 +174,8 @@ void UCharacterCustomizationComponent::SetColorBodyArt(uint8 Value)
 {
 	ColorBodyArt = Value;
 }
+
+*/
 
 
 /*

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Runtime/Engine/Classes/Materials/Material.h"
 #include "CharacterCustomizationComponent.generated.h"
 
 
@@ -169,6 +170,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Settings")
 	UMaterialInstanceDynamic* DynamicMaterial;
 
+	UMaterialInterface* MainMaterial;
+	UMaterialInterface* MaskMaterial;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Settings")
 	uint8 ColorSkin;
 
@@ -199,14 +203,51 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Settings")
 	uint8 ColorBodyArt;
 
+	//Linear colors
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Settings")
+	FLinearColor LinearColorSkin;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Settings")
+	FLinearColor LinearColorPrimary;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Settings")
+	FLinearColor LinearColorSecondary;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Settings")
+	FLinearColor LinearColorMetalPrimary;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Settings")
+	FLinearColor LinearColorMetalSecondary;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Settings")
+	FLinearColor LinearColorMetalDark;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Settings")
+	FLinearColor LinearColorLeatherPrimary;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Settings")
+	FLinearColor LinearColorLeatherSecondary;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Settings")
+	FLinearColor LinearColorHair;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Settings")
+	FLinearColor LinearColorBodyArt;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Settings")
+	FLinearColor LinearColorStubble;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material Settings")
+	FLinearColor LinearColorScar;
+
 	//Functions
 	UFUNCTION(BlueprintCallable, Category = "Mesh Merge")
 	TArray<USkeletalMesh*> GetAllMeshesToMerge();
 
-	/*UFUNCTION(BlueprintCallable, Category = "Mesh Merge")
-	void GenerateAllMaterials();*/
+	UFUNCTION(BlueprintCallable, Category = "Mesh Merge")
+	void GenerateAllMaterials();
 
-	void SetColorSkin(uint8 Value);
+	/*void SetColorSkin(uint8 Value);
 	void SetColorPrimary(uint8 Value);
 	void SetColorSecondary(uint8 Value);
 	void SetColorMetalPrimary(uint8 Value);
@@ -215,6 +256,6 @@ public:
 	void SetColorLeatherPrimary(uint8 Value);
 	void SetColorLeatherSecondary(uint8 Value);
 	void SetColorHair(uint8 Value);
-	void SetColorBodyArt(uint8 Value);
+	void SetColorBodyArt(uint8 Value);*/
 
 };

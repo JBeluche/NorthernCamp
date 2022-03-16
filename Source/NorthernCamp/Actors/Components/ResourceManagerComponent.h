@@ -116,6 +116,7 @@ public:
 	int32 AddResource(FResourceInfo Resource, FName StorageName = FName(""));
 	TMap<EResourceType, int32> GetTotalResourceAmount();
 	bool TransferResources(FResourceInfo ResourceInfo, UResourceManagerComponent* ResourceManager);
+	void RemoveResourceNeed(FResourceInfo ResourceInfo);
 	void UpdateResourceNeed(TArray<FResourceInfo> ResourcesNeeded);
 	bool ConsumeResource(FResourceInfo ResourceInfo);
 

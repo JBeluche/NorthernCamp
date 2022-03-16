@@ -8,10 +8,9 @@
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAnHourStruck, float, CurrentHour);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDayEnded, float, CurrentDay);
 
 class ADirectionalLight;
-
 
 UCLASS()
 class NORTHERNCAMP_API ADayNightActorController : public AActor
@@ -28,8 +27,14 @@ protected:
 
 public:	
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CurrentDay;
+	
 	UPROPERTY(BlueprintAssignable, Category="Hourly events")
 	FOnAnHourStruck AnHourStruck;
+
+	UPROPERTY(BlueprintAssignable, Category="Hourly events")
+	FOnDayEnded ADayEnded;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ADirectionalLight* SunLigth;

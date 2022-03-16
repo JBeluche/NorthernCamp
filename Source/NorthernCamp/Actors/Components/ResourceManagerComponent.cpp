@@ -423,7 +423,6 @@ void UResourceManagerComponent::UpdateResourceNeed(TArray<FResourceInfo> Resourc
 	//Create an array as big as the one give(ResourceNeedArray)
 	TArray<FResourceInfo> SortedArray = CurrentResourceNeeded;
 	int32 PositionToSet = (CurrentResourceNeeded.Num() - 1);
-
 	//Check each individual. If its higher, add position++
 	for(FResourceInfo ArrayItem : CurrentResourceNeeded)
 	{
@@ -437,9 +436,7 @@ void UResourceManagerComponent::UpdateResourceNeed(TArray<FResourceInfo> Resourc
 		SortedArray[PositionToSet] = ArrayItem;
 		PositionToSet = (CurrentResourceNeeded.Num() - 1);
 	}
-
 	int32 ResourceLeftToSubtrack = ResourceInfo.Amount;
-
 	int32 ArrayPosition = 0;
 	TArray<int32> ArrayPositionsToRemove;
 	
@@ -467,12 +464,10 @@ void UResourceManagerComponent::UpdateResourceNeed(TArray<FResourceInfo> Resourc
 		}
 		ArrayPosition++;
 	}
-
 	for(int32 PositionToRemove : ArrayPositionsToRemove)
 	{
 		SortedArray.RemoveAt(PositionToRemove);
 	}
-
 	CurrentResourceNeeded = SortedArray;
 */
 }
@@ -669,4 +664,3 @@ UResourcesPickupSpot* UResourceManagerComponent::GetClosestPickupSpot(ACharacter
 
 	return ClosestPickupSpot;
 }
-

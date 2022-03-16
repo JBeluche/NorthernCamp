@@ -16,10 +16,15 @@ void UBTS_UpdateCurrentTask::TickNode(UBehaviorTreeComponent &OwnerComp, uint8 *
 {
 
 	AAISettlerController* Controller = Cast<AAISettlerController>(OwnerComp.GetAIOwner());
+	
+	if(!Controller){
+
+		// Apperently it fails for some.
+		//UE_LOG(LogTemp, Error, TEXT("Controller cast failed!"));
+
+		return;}
+
 	ACharacterSettler* Settler = Cast<ACharacterSettler>(Controller->GetPawn());
-
-
-	if(!Controller){UE_LOG(LogTemp, Error, TEXT("Controller cast failed!"));return;}
 	if(!Settler){UE_LOG(LogTemp, Error, TEXT("Settler cast failed!"));return;}
 	if(Settler->VitalsComponent == nullptr){UE_LOG(LogTemp, Error, TEXT("Vitals cast failed"));return;}
 
@@ -54,6 +59,7 @@ void UBTS_UpdateCurrentTask::TickNode(UBehaviorTreeComponent &OwnerComp, uint8 *
 		}
 		if(!bWeHaveEnoughtResources)
 		{
+
 			Settler->ResourceManagerComp->UpdateResourceNeed(NewResourcesNeeded);
 		}
 		else

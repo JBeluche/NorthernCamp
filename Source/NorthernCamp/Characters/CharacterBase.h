@@ -7,6 +7,25 @@
 #include "CharacterBase.generated.h"
 
 class UCharacterCustomizationComponent;
+
+UENUM()
+enum class ECurrentStance : uint8 
+{
+	Settler UMETA(DisplayName = "Settler"),
+	Defending UMETA(DisplayName = "Defending"),
+	Attacking UMETA(DisplayName = "Attacking"),
+};
+
+UENUM()
+enum class EFactions : uint8 
+{
+	None UMETA(DisplayName = "None"),
+	Novard UMETA(DisplayName = "Novard"),
+	Raider UMETA(DisplayName = "Raider"),
+};
+
+
+
 UCLASS()
 class NORTHERNCAMP_API ACharacterBase : public ACharacter
 {
@@ -36,8 +55,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 	float ActionRadius = 200.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	EFactions Faction;
+
 	bool WithinActionRadius(AActor* Actor);
 	void SetSkeletalMesh(USkeletalMesh* GeneratedSkeletalMesh);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Building)
+	USkeletalMesh* BaseMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Mask;
@@ -47,5 +72,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Settings", meta = (AllowPrivateAccess = "true"))
 	UCharacterCustomizationComponent* CharacterCustomizationComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (AllowPrivateAccess = "true"))
+	ECurrentStance CurrentStance;
 
 };

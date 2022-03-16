@@ -97,7 +97,7 @@ void AResourceController::UpdateTotalResouces()
 
 void AResourceController::AddResourceManagerComponent(UResourceManagerComponent* ResouceManager)
 {
-	UE_LOG(LogTemp, Error, TEXT("Resouce Controller adding: %s"), *ResouceManager->GetReadableName());
+	//UE_LOG(LogTemp, Error, TEXT("Resouce Controller adding: %s"), *ResouceManager->GetReadableName());
 
 	if (ResouceManager)
 	{

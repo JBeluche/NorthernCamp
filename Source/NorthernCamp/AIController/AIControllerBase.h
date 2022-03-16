@@ -9,15 +9,28 @@
 
 #include "AIControllerBase.generated.h"
 
-/**
- * 
- */
+
+class ACharacterBase;
+
+
 UCLASS()
 class NORTHERNCAMP_API AAIControllerBase : public AAIController
 {
 	GENERATED_BODY()
 
+public:
+	AAIControllerBase();
 
+	virtual void BeginPlay() override;
+	
+	ACharacterBase* CharacterOwner;
+
+	UBehaviorTree* CurrentBehaviorTree;
+
+	TSubclassOf<class UBehaviorTree> BehaviorTreeSettler;
+	TSubclassOf<class UBehaviorTree> BehaviorTreeDefender;
+	TSubclassOf<class UBehaviorTree> BehaviorTreeAgresor;
+	
 
 	
 };

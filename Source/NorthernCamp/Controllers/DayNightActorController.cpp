@@ -19,6 +19,8 @@ void ADayNightActorController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	CurrentDay = 1;
+
 	//Start the time timer
 	SetTimeTo(StartingHour, 0.0f);
 
@@ -80,7 +82,7 @@ void ADayNightActorController::MoveTime()
 	{
 		CurrentTimeHours++;
 		AnHourStruck.Broadcast(CurrentTimeHours);
-		if(CurrentTimeHours >= 24.0f){CurrentTimeHours = 0.0f;}
+		if(CurrentTimeHours >= 24.0f){CurrentDay++; ADayEnded.Broadcast(CurrentDay); CurrentTimeHours = 0.0f;}
 		//if(CurrentTimeMinutes > 60.0f){CurrentTimeMinutes = 60.0f / (SecondsPerHour / TimeUpdatesInterval);}
 		if(CurrentTimeMinutes >= 60.0f){CurrentTimeMinutes = CurrentTimeMinutes - 60.0f; }
 	}

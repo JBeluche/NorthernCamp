@@ -61,7 +61,7 @@ void UVitalsComponent::UpdateVitals()
 
 		//////
 		// WATER
-		UE_LOG(LogTemp, Error, TEXT("VitalsComponent: Current water: %f"), CurrentWaterMeter);
+		//UE_LOG(LogTemp, Error, TEXT("VitalsComponent: Current water: %f"), CurrentWaterMeter);
 
 		if(CurrentWaterMeter <= WaterIsLowThreshold)
         {

@@ -31,24 +31,11 @@ class NORTHERNCAMP_API AAISettlerController : public AAIControllerBase
 {
 	GENERATED_BODY()
 	
-	public:
+public:
 
-
-	AAISettlerController();
-	
-	ACharacterSettler* CharacterOwner;
-
-	virtual void BeginPlay() override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UBehaviorTree* BehaviorTree;
 
 	ADayNightActorController* DayNightActorController;
 
-	UFUNCTION()
-	void HourStruck(float CurrentHour);
-	//Water
-	void WaterIsLow();
 
 };
 

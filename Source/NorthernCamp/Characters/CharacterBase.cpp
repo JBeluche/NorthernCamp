@@ -3,6 +3,7 @@
 
 #include "NorthernCamp/Characters/CharacterBase.h"
 
+#include "Components/CapsuleComponent.h"
 #include "Components/CharacterCustomizationComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -30,7 +31,19 @@ ACharacterBase::ACharacterBase()
 	SkeletalMesh->SetRelativeRotation(NewRotation);
 	SkeletalMesh->SetRelativeLocation(NewPosition);
 
+	//Setting a cube, so clicking on actors is easier.
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> ReferenceObject(TEXT("/Game/_Character/Modular/Meshes/SKM_Polygon_Base"));
+	BaseMesh = ReferenceObject.Object;
+	GetMesh()->SetSkeletalMesh(BaseMesh);
+
+	
+	GetMesh()->SetRelativeRotation(NewRotation);
+	GetMesh()->SetRelativeLocation(NewPosition);
+
 	CharacterCustomizationComponent = CreateDefaultSubobject<UCharacterCustomizationComponent>(TEXT("Character Customization Component"));
+
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
 
 
 }
@@ -41,7 +54,9 @@ void ACharacterBase::BeginPlay()
 	Super::BeginPlay();
 	GetCharacterMovement()->bUseRVOAvoidance = true;
 
+	GetMesh()->SetSkeletalMesh(nullptr);
 
+	GetCapsuleComponent()->SetCanEverAffectNavigation(true);
 
 }
 
