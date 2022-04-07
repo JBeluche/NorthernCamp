@@ -25,8 +25,8 @@ ANorthernCampGameMode::ANorthernCampGameMode()
 void ANorthernCampGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Error, TEXT("Game mode awakes"));
-
+	GEngine->Exec( GetWorld(), TEXT( "stat fps" ) );
+	GEngine->Exec( GetWorld(), TEXT( "stat unit" ) );
 	if(GetWorld())
 	{
 		for (TActorIterator<ADayNightActorController> ActorItr(GetWorld()); ActorItr; ++ActorItr) 

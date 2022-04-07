@@ -18,11 +18,25 @@ ASpawnPoint::ASpawnPoint()
 	BoatDockingSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Spawn radius"));
 	BoatDockingSphere->SetupAttachment(SceneComponent);
 
+	//static ConstructorHelpers::FObjectFinder<UBlueprint> ItemBlueprint(TEXT("Blueprint'/Game/Blueprints/Pawns/BP_RaidingBoatActor.BP_RaidingBoatActor'"));
 
-	static ConstructorHelpers::FObjectFinder<UBlueprint> ItemBlueprint(TEXT("Blueprint'/Game/Blueprints/Pawns/BP_RaidingBoatActor'"));
+	/*
 	if (ItemBlueprint.Object){
 		BoatBlueprint = (UClass*)ItemBlueprint.Object->GeneratedClass;
 	}
+
+	*/
+
+	
+	const ConstructorHelpers::FClassFinder<AActor> ItemBlueprint(TEXT("/Game/Blueprints/Pawns/BP_RaidingBoatActor"));
+
+	BoatBlueprintClass = ItemBlueprint.Class;
+
+	
+	/*const ConstructorHelpers::FClassFinder<AActor> BP_Raider01(TEXT("Blueprint'/Game/Blueprints/Characters/SeaRaiders/SeaRainder_01.SeaRainder_01'"));
+
+	RaiderBlueprintClass = BP_Raider01.Class;*/
+
 
 
 }
@@ -34,7 +48,7 @@ void ASpawnPoint::BeginPlay()
 	World = GetWorld();
 }
 
-void ASpawnPoint::SpawnRaiders(TArray<TSubclassOf<class ACharacterBase>> RaidersClassToSpawn)
+void ASpawnPoint::SpawnRaiders(TArray<TSubclassOf<AActor>> RaidersClassToSpawn)
 {
 	if(bIsBoatSpawn)
 	{
@@ -47,8 +61,13 @@ void ASpawnPoint::SpawnRaiders(TArray<TSubclassOf<class ACharacterBase>> Raiders
 				//Foreach in the tmap
 				for (int32 i = 0; i < RaidersClassToSpawn.Num(); i++)
 				{
+					//if(!Cast<ACharacterBase>(RaidersClassToSpawn[i])){UE_LOG(LogTemp, Error, TEXT("ASpawnPoint::SpawnRaiders could not cast RaidersClassToSpawn")); return;}
 					ACharacterBase* SpawnedCharacter = World->SpawnActor<ACharacterBase>(RaidersClassToSpawn[i], GetActorLocation(), GetActorRotation(), SpawnParams);
 					if (SpawnedCharacter){
+						FCharacterSetupSettings CharacterSetupSettings;
+						CharacterSetupSettings.CharacterStance = ECurrentStance::Attacking;
+						CharacterSetupSettings.bShouldBeFrozen = true;
+						SpawnedCharacter->SetupCharacter(CharacterSetupSettings);
 						SpawnedRaiders.Add(SpawnedCharacter);
 					}
 				}
@@ -67,7 +86,7 @@ ARaidingBoatActor* ASpawnPoint::SpawnBoat()
 
 	if (World){
 		FActorSpawnParameters SpawnParams;
-		ARaidingBoatActor* SpawnedBoat = World->SpawnActor<ARaidingBoatActor>(BoatBlueprint, GetActorLocation(), GetActorRotation(), SpawnParams);
+		ARaidingBoatActor* SpawnedBoat = World->SpawnActor<ARaidingBoatActor>(BoatBlueprintClass, GetActorLocation(), GetActorRotation(), SpawnParams);
 		if (SpawnedBoat){
 			return SpawnedBoat;
 		}

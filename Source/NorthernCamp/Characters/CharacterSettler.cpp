@@ -11,7 +11,7 @@
 
 ACharacterSettler::ACharacterSettler()
 {
-	VitalsComponent = CreateDefaultSubobject<UVitalsComponent>(TEXT("Vitals Component"));
+	OldVitalsComponent = CreateDefaultSubobject<UVitalsComponent>(TEXT("Old Vitals Component"));
 	ResourceManagerComp = CreateDefaultSubobject<UResourceManagerComponent>(TEXT("Resource Manager"));
 
 
@@ -77,7 +77,7 @@ void ACharacterSettler::UpdateSchedule(float CurrentHour)
 
 UVitalsComponent* ACharacterSettler::GetCharacterVitalsComponent()
 {
-	return VitalsComponent;
+	return OldVitalsComponent;
 }
 
 bool ACharacterSettler::DrinkWater(float Amount)

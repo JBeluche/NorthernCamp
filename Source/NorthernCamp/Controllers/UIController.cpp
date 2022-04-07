@@ -92,6 +92,7 @@ UUIController::UUIController()
 void UUIController::BeginPlay()
 {
 	Super::BeginPlay();
+	
 }
 
 void UUIController::UpdateUI(ECurrentUI NewCurrentUI)
@@ -99,6 +100,8 @@ void UUIController::UpdateUI(ECurrentUI NewCurrentUI)
 	
 	PlayerController = Cast<ANorthernCampPlayerController>(GetOwner());
 	CurrentUI = NewCurrentUI;
+
+	UE_LOG(LogTemp, Error, TEXT("the ui was updated!"));
 
 	if (PlayerController)
 	{
@@ -132,6 +135,8 @@ void UUIController::UpdateUI(ECurrentUI NewCurrentUI)
 void UUIController::DisplayPopup(EPopup NewPopup)
 {
 
+	/*UE_LOG(LogTemp, Error, TEXT("Popup was added!"));
+
 	Overlay = CreateWidget<UUserWidget>(PlayerController, BlackOverlayWidget, FName("Overlay for popups"));
 	Overlay->AddToViewport();
 
@@ -152,11 +157,13 @@ void UUIController::DisplayPopup(EPopup NewPopup)
 	bIsInMenu = true;
 	bScrollingEnabled = false;
 
-	Popup->AddToViewport();
+	Popup->AddToViewport();*/
 }
 
 void UUIController::RemovePopup(EPopup PopupToRemove)
 {
+	UE_LOG(LogTemp, Error, TEXT("Popup was removed!"));
+/*
 	Overlay->RemoveFromViewport();
 	PlayerController->ResetControlls();
 	
@@ -170,6 +177,6 @@ void UUIController::RemovePopup(EPopup PopupToRemove)
 		{
 			MainUI->bIsEnabled = true;
 		}
-	}
+	}*/
 }
 

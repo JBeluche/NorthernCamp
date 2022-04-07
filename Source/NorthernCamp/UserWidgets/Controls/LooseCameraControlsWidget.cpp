@@ -126,8 +126,10 @@ void ULooseCameraControlsWidget::UpdateResoucesAmountDisplayed()
 			}*/
 		if(!PlayerController){UE_LOG(LogTemp, Error, TEXT("ULooseCameraControlsWidget: Nullptr PlayerController")); return;}
 		if(!PlayerController->UIController->WorkplaceEntryWidget){UE_LOG(LogTemp, Error, TEXT("ULooseCameraControlsWidget: Nullptr PlayerController->UIController->WorkplaceEntryWidget")); return;}
-
-			EntryWidget = WidgetTree->ConstructWidget<UUserWidget>(PlayerController->UIController->ResourceCounterEntryWidget);
+			if(!EntryWidget)
+			{
+				EntryWidget = WidgetTree->ConstructWidget<UUserWidget>(PlayerController->UIController->ResourceCounterEntryWidget);
+			}
 			if(!EntryWidget){UE_LOG(LogTemp, Error, TEXT("LooseCameraControlsWidget: Nullptr entrywidget")); return;}
 			/*FWidgetTransform Transform;
 			Transform.Scale = FVector2D(0.66f, 0.66f);

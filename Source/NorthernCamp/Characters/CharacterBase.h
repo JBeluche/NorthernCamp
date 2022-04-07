@@ -7,6 +7,9 @@
 #include "CharacterBase.generated.h"
 
 class UCharacterCustomizationComponent;
+class AAIControllerBase;
+class UVitalsComponentBase;
+//Enums
 
 UENUM()
 enum class ECurrentStance : uint8 
@@ -24,8 +27,25 @@ enum class EFactions : uint8
 	Raider UMETA(DisplayName = "Raider"),
 };
 
+//Structs
 
+USTRUCT(BlueprintType)
+struct FCharacterSetupSettings
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Setup Settings")
+	EFactions Faction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Setup Settings")
+	ECurrentStance CharacterStance;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Setup Settings")
+	bool bShouldBeFrozen;
+
+};
+
+//Class
 UCLASS()
 class NORTHERNCAMP_API ACharacterBase : public ACharacter
 {
@@ -39,12 +59,33 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	//Variables
+	AAIControllerBase* AIController;
+	UVitalsComponentBase* VitalsComponent;
+	UAnimMontage* AttackAnimation;
+	float AttackRange = 100.0f;
+	float WeaponDamage = 20.0f;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	//Functions
+	UVitalsComponentBase* GetVitals();
+	UAnimMontage * GetAttackAnimation();
+	float GetAttackRange();
+	float GetWeaponDamage();
+	
+	//UFUNCTION()
+	void PlayAnimationMontage(UAnimMontage* MontageToPlay, bool bIsLooping);
+	void PauseAnimation(UAnimMontage* MontageToPause);
+	void ResumeAnimation(UAnimMontage* MontageToResume);
+	
+	//Variables
+
 
 
 	float CurrentSleep = 100.0f;
@@ -60,6 +101,8 @@ public:
 
 	bool WithinActionRadius(AActor* Actor);
 	void SetSkeletalMesh(USkeletalMesh* GeneratedSkeletalMesh);
+	void SetupCharacter(FCharacterSetupSettings CharacterSettings);
+	void SetFrozen(bool bIsFrozen);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Building)
 	USkeletalMesh* BaseMesh;
@@ -75,5 +118,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (AllowPrivateAccess = "true"))
 	ECurrentStance CurrentStance;
+
 
 };

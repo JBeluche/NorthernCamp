@@ -29,12 +29,12 @@ void AWildResourceGenerator::BeginPlay()
 	Super::BeginPlay();
 
 
-	UNavigationSystemV1* NavigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
-	FNavLocation ResultLocation;
+	//UNavigationSystemV1* NavigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+	//FNavLocation ResultLocation;
 
-	if(NavigationSystem)
+			/*if(NavigationSystem)
 	{
-		
+
 
 	for (TPair<TSubclassOf<AWildResourceActorBase>, int32>& Pair : WildResourcesToSpawn)
 	{
@@ -49,7 +49,7 @@ void AWildResourceGenerator::BeginPlay()
 	}else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Navugation system is not casting in wild resource generator "));
-	}
+	}*/
 
 	//Get the resources
 	//How many per resource?

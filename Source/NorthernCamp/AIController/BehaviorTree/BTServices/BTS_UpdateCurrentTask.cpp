@@ -26,7 +26,7 @@ void UBTS_UpdateCurrentTask::TickNode(UBehaviorTreeComponent &OwnerComp, uint8 *
 
 	ACharacterSettler* Settler = Cast<ACharacterSettler>(Controller->GetPawn());
 	if(!Settler){UE_LOG(LogTemp, Error, TEXT("Settler cast failed!"));return;}
-	if(Settler->VitalsComponent == nullptr){UE_LOG(LogTemp, Error, TEXT("Vitals cast failed"));return;}
+	if(Settler->OldVitalsComponent == nullptr){UE_LOG(LogTemp, Error, TEXT("Vitals cast failed"));return;}
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("SelfActor"), Settler);
 
@@ -36,7 +36,7 @@ void UBTS_UpdateCurrentTask::TickNode(UBehaviorTreeComponent &OwnerComp, uint8 *
 
 
 	//Settler is simply thirsty
-	if(Settler->VitalsComponent->NeedWater == true)
+	if(Settler->OldVitalsComponent->NeedWater == true)
 	{
 		TArray<FResourceInfo> NewResourcesNeeded;
 		FResourceInfo ResourceInfo;

@@ -22,6 +22,7 @@ void UBTS_UpdateWaterLocation::TickNode(UBehaviorTreeComponent &OwnerComp, uint8
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
+	UE_LOG(LogTemp, Error, TEXT("Ballsacks!!!") );
 
 
 }

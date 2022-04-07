@@ -41,16 +41,17 @@ public:
 	ARaidingBoatActor* SpawnBoat();
 
 	
-	void SpawnRaiders(TArray<TSubclassOf<class ACharacterBase>> RaidersClassToSpawn);
+	void SpawnRaiders(TArray<TSubclassOf<AActor>> RaidersClassToSpawn);
 
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
-	TSubclassOf<class ARaidingBoatActor> BoatBlueprint;
+	TSubclassOf<AActor> BoatBlueprintClass;
 
 	UWorld* World;
+
 	TArray<ACharacterBase*> SpawnedRaiders;
 
 };

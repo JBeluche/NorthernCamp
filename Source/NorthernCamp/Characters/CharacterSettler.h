@@ -59,7 +59,7 @@ public:
 	FText Name;
 	
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
-	UVitalsComponent* VitalsComponent;
+	UVitalsComponent* OldVitalsComponent;
 
 	UVitalsComponent* GetCharacterVitalsComponent();
 

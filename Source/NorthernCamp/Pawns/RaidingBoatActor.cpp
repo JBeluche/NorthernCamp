@@ -102,6 +102,7 @@ void ARaidingBoatActor::AttachRaiders(TArray<ACharacterBase*> RaidersToAttach)
 		}
 		RaidersToAttach[i]->GetCharacterMovement()->SetDefaultMovementMode();
 		RaidersToAttach[i]->SetActorLocation(Cast<UBoatSeat>(*CompIt)->GetComponentLocation());
+		RaidersToAttach[i]->SetFrozen(true);
 		i++;
 	}
 
@@ -113,8 +114,6 @@ void ARaidingBoatActor::Disembark()
 	UNavigationSystemV1* NavigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
 	FNavLocation ResultLocation;
 
-	UE_LOG(LogTemp, Error, TEXT("Tick tack"));
-
 	if(NavigationSystem == nullptr){UE_LOG(LogTemp, Warning, TEXT("ARaidingBoatActor::Disembark nullptr NavigationSystem")); return;}
 
 	//For each raider, get a free spot on the navmesh and move him there.
@@ -125,6 +124,7 @@ void ARaidingBoatActor::Disembark()
 		FVector NewLocation = ResultLocation.Location;
 		NewLocation.Z += BoatHeightFalling;
 		Raider->SetActorLocation(NewLocation);
+		Raider->SetFrozen(false);
 				
 	}
 }

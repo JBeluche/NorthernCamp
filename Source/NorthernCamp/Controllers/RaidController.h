@@ -28,7 +28,7 @@ struct FRaidInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Raid Settings")
 	int32 HourToSpawn;
 
-	TArray<TSubclassOf<class ACharacterBase>> RaidersClassToSpawn;
+	TArray<TSubclassOf<AActor>> RaidersClassToSpawn;
 
 };
 
@@ -57,7 +57,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	TSubclassOf<class ACharacterBase> Raider_01;
+	TSubclassOf<AActor> RaiderBlueprintClass;
 
 
 	UFUNCTION() 

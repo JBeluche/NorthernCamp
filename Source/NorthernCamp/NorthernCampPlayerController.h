@@ -25,6 +25,15 @@ enum class ECurrentPawn : uint8
 	
 };
 
+UENUM(BlueprintType)
+enum class ECurrentCampStance : uint8 
+{
+	Building UMETA(DisplayName = "Building"),
+	Battle UMETA(DisplayName = "Battle"),
+	
+};
+
+
 
 
 UCLASS()

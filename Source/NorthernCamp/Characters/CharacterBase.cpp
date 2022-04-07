@@ -3,8 +3,10 @@
 
 #include "NorthernCamp/Characters/CharacterBase.h"
 
+#include "NorthernCamp/AIController/AIControllerBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/CharacterCustomizationComponent.h"
+#include "Components/VitalsComponentBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -18,6 +20,7 @@ ACharacterBase::ACharacterBase()
 	//This was needed to generated a SKMESH using modular character
 	Mask = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mask"));
 	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	VitalsComponent = CreateDefaultSubobject<UVitalsComponentBase>(TEXT("Vitals Component"));
 
 	Mask->SetupAttachment(RootComponent);
 	SkeletalMesh->SetupAttachment(Mask);
@@ -45,18 +48,31 @@ ACharacterBase::ACharacterBase()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 
+	AIControllerClass = AAIControllerBase::StaticClass();
 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> BP_AttackAnimation(TEXT("AnimMontage'/Game/_Character/Modular/Animations/PolygonAttackUnarmed_1_Montage.PolygonAttackUnarmed_1_Montage'"));
+	AttackAnimation = BP_AttackAnimation.Object;
 }
 
 // Called when the game starts or when spawned
 void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	GetCharacterMovement()->bUseRVOAvoidance = true;
+
+	
+	//GetCharacterMovement()->bUseRVOAvoidance = true;
 
 	GetMesh()->SetSkeletalMesh(nullptr);
 
-	GetCapsuleComponent()->SetCanEverAffectNavigation(true);
+
+	SpawnDefaultController();
+
+	AIController = Cast<AAIControllerBase>(GetController());
+
+	if(AIController == nullptr){UE_LOG(LogTemp, Error, TEXT("ACharacterBase::BeginPlay nullptr for AIController")); return;}
+
+	AIController->SetupController();
+
 
 }
 
@@ -74,11 +90,47 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+// Todo
+// Make get componment and get animations with enums for componenets and animations
+
+UVitalsComponentBase* ACharacterBase::GetVitals()
+{
+	return VitalsComponent;
+}
+
+UAnimMontage* ACharacterBase::GetAttackAnimation()
+{
+	return AttackAnimation;
+}
+
+void ACharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay, bool bIsLooping)
+{
+	SkeletalMesh->GetAnimInstance()->Montage_Play(MontageToPlay, 1, EMontagePlayReturnType::MontageLength, 0.0f);
+}
+void ACharacterBase::PauseAnimation(UAnimMontage* MontageToPause)
+{
+	SkeletalMesh->GetAnimInstance()->Montage_Pause(MontageToPause);
+}
+
+void ACharacterBase::ResumeAnimation(UAnimMontage* MontageToResume)
+{
+	SkeletalMesh->GetAnimInstance()->Montage_Resume(MontageToResume);
+}
+float ACharacterBase::GetAttackRange()
+{
+	return AttackRange;
+}
+
+float ACharacterBase::GetWeaponDamage()
+{
+	return WeaponDamage;
+}
+
 bool ACharacterBase::WithinActionRadius(AActor* Actor)
 {
 	const float TempDistance = FVector::Dist(GetActorLocation(), Actor->GetActorLocation());
 
-	UE_LOG(LogTemp, Error, TEXT("The distance from the player is: %f and the radius is: %f"), TempDistance, ActionRadius);
+	
 	if(TempDistance < ActionRadius)
 	{
 		return true;	
@@ -90,4 +142,22 @@ bool ACharacterBase::WithinActionRadius(AActor* Actor)
 void ACharacterBase::SetSkeletalMesh(USkeletalMesh *GeneratedSkeletalMesh)
 {
 	SkeletalMesh->SetSkeletalMesh(GeneratedSkeletalMesh, true);
+}
+
+void ACharacterBase::SetupCharacter(FCharacterSetupSettings CharacterSettings)
+{
+	//Set to frozen?
+	AIController->SetCharacterIsFrozen(CharacterSettings.bShouldBeFrozen);
+	CurrentStance = CharacterSettings.CharacterStance;
+	//Set behavior tree?
+	if(AIController == nullptr){UE_LOG(LogTemp, Warning, TEXT("ACharacterBase::SetupCharacter nullptr for AIController"))}
+	AIController->SetBehaviorTree(ECurrentStance::Attacking);
+	
+	//Change faction?
+	
+}
+
+void ACharacterBase::SetFrozen(bool bIsFrozen)
+{
+	AIController->SetCharacterIsFrozen(bIsFrozen);
 }

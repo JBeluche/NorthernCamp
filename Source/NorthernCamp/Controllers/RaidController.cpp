@@ -13,10 +13,14 @@ ARaidController::ARaidController()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	static ConstructorHelpers::FObjectFinder<UBlueprint> BP_Raider01(TEXT("Blueprint'/Game/Blueprints/Characters/SeaRaiders/SeaRainder_01.SeaRainder_01'"));
+	/*static ConstructorHelpers::FObjectFinder<UBlueprint> BP_Raider01(TEXT("Blueprint'/Game/Blueprints/Characters/SeaRaiders/SeaRainder_01.SeaRainder_01'"));
 	if (BP_Raider01.Object){
 		Raider_01 = (UClass*)BP_Raider01.Object->GeneratedClass;
 	}
+*/
+	const ConstructorHelpers::FClassFinder<AActor> BP_Raider01(TEXT("/Game/Blueprints/Characters/SeaRaiders/SeaRainder_01"));
+
+	RaiderBlueprintClass = BP_Raider01.Class;
 
 	//Characters blueprint?
 }
@@ -43,9 +47,9 @@ void ARaidController::DayEnded(float CurrentDay)
 	{
 		FRaidInfo RaidInfo;
 
-		RaidInfo.RaidersClassToSpawn.Add(Raider_01);
-		RaidInfo.RaidersClassToSpawn.Add(Raider_01);
-		RaidInfo.RaidersClassToSpawn.Add(Raider_01);
+		RaidInfo.RaidersClassToSpawn.Add(RaiderBlueprintClass);
+		RaidInfo.RaidersClassToSpawn.Add(RaiderBlueprintClass);
+		RaidInfo.RaidersClassToSpawn.Add(RaiderBlueprintClass);
 		RaidInfo.Faction = EFactions::Raider;
 		
 		SpawnRaid(RaidInfo);

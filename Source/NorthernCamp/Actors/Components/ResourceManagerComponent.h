@@ -10,7 +10,6 @@
 
 #include "ResourceManagerComponent.generated.h"
 
-class AResourceController;
 class ADayNightActorController;
 enum class EResourceType : uint8;
 
