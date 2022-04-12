@@ -8,6 +8,7 @@
 #include "NorthernCamp/AIController/AIControllerBase.h"
 #include "NorthernCamp/AIController/BehaviorTree/BlackboardKeys/AgresorBlackboardKeys.h"
 #include "NorthernCamp/Characters/CharacterBase.h"
+#include "NorthernCamp/Characters/CharacterHero.h"
 #include "Perception/AIPerceptionComponent.h"
 
 UBTS_UpdateEnemyTarget::UBTS_UpdateEnemyTarget()
@@ -38,10 +39,10 @@ void UBTS_UpdateEnemyTarget::TickNode(UBehaviorTreeComponent &OwnerComp, uint8 *
 			{
 				FVector MyLocation = Character->GetActorLocation(); 
 				FVector OtherPawnLocation = PercievedCharacter->GetActorLocation(); 
-				const float TempDistance = FVector::Dist(MyLocation, OtherPawnLocation); 
-				if (NearestDistance > TempDistance) 
+				const float TempDistance = FVector::Dist(MyLocation, OtherPawnLocation);
+			
+				if (NearestDistance > TempDistance && !PercievedCharacter->bDiedOrWounded) 
 				{
-				//	UE_LOG(LogTemp, Error, TEXT("Character: %s, found this character: %s to be closer"), *Character->GetName(), *PercievedCharacter->GetName());
 					NearestDistance = TempDistance; 
 					NearestEnemy = PercievedCharacter; 
 				} 

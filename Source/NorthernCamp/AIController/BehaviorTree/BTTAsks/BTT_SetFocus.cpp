@@ -9,7 +9,7 @@
 
 UBTT_SetFocus::UBTT_SetFocus()
 {
-	NodeName = TEXT("Reserve pickup spot");
+	NodeName = TEXT("Set focus");
 }
 
 EBTNodeResult::Type UBTT_SetFocus::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -22,7 +22,7 @@ EBTNodeResult::Type UBTT_SetFocus::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 	if(!AIController){UE_LOG(LogTemp,Error, TEXT("UBTT_SetFocus::ExecuteTask nullptr AIController")); return EBTNodeResult::Failed;}
 	if(!Enemy){UE_LOG(LogTemp,Error, TEXT("UBTT_SetFocus::ExecuteTask nullptr EnnemyTarget")); return EBTNodeResult::Failed;}
 
-	AIController->SetFocus(Enemy);
+	AIController->SetFocus(Enemy, EAIFocusPriority::Default);
 
 	return EBTNodeResult::Succeeded;
 }

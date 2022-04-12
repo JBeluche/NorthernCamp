@@ -4,6 +4,7 @@
 #include "NorthernCamp/Characters/Components/VitalsComponentBase.h"
 
 #include "NorthernCamp/Characters/CharacterBase.h"
+#include "NorthernCamp/Characters/CharacterHero.h"
 
 // Sets default values for this component's properties
 UVitalsComponentBase::UVitalsComponentBase()
@@ -47,10 +48,11 @@ void UVitalsComponentBase::DeathHandler()
 	
 	if(Character->bIsHero)
 	{
-		
+		ACharacterHero* Hero = Cast<ACharacterHero>(GetOwner());
+		Hero->SetIsWounded(true);
 	}
 	else
 	{
-		GetOwner()->Destroy();
+		Character->Died();
 	}
 }

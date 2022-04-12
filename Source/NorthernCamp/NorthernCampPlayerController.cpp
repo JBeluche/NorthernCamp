@@ -181,7 +181,14 @@ void ANorthernCampPlayerController::DoubleTapTouchCondition()
 		{
 			if(SelectedHero != nullptr && UIController->bIsInMenu == false)
 			{
-				UAIBlueprintHelperLibrary::SimpleMoveToLocation(SelectedHero->GetController(), LastTouchHitResults.Location);
+				if(SelectedHero->bIsWounded)
+				{
+					//Popup message that hero is down
+				}
+				else
+				{
+					UAIBlueprintHelperLibrary::SimpleMoveToLocation(SelectedHero->GetController(), LastTouchHitResults.Location);
+				}
 			}
 		}
 	}

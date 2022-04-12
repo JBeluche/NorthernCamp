@@ -52,7 +52,7 @@ ACharacterBase::ACharacterBase()
 
 	AIControllerClass = AAIControllerBase::StaticClass();
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> BP_AttackAnimation(TEXT("AnimMontage'/Game/_Character/Modular/Animations/PolygonAttackUnarmed_1_Montage.PolygonAttackUnarmed_1_Montage'"));
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> BP_AttackAnimation(TEXT("AnimMontage'/Game/_Character/Modular/Animations/Montage_AttackUnarmed.Montage_AttackUnarmed'"));
 	AttackAnimation = BP_AttackAnimation.Object;
 }
 
@@ -74,12 +74,7 @@ void ACharacterBase::BeginPlay()
 	if(AIController == nullptr){UE_LOG(LogTemp, Error, TEXT("ACharacterBase::BeginPlay nullptr for AIController")); return;}
 
 	AIController->SetupController();
-
-
-	
-	
-
-
+	bDiedOrWounded = false;
 
 }
 
@@ -90,16 +85,12 @@ void ACharacterBase::Tick(float DeltaTime)
 
 	if(GetCharacterMovement()->Velocity.Size() > 0.0f)
 	{
-	
-		UE_LOG(LogTemp, Error, TEXT("%s is moving"), *GetName());
 		SetCanAffectNavigationGeneration(false, true) ;
 	}
 	else
 	{
 		SetCanAffectNavigationGeneration(true, true) ;
 	}		
-
-	
 }
 
 // Called to bind functionality to input
@@ -159,6 +150,26 @@ bool ACharacterBase::WithinActionRadius(AActor* Actor)
 	return false;
 }
 
+void ACharacterBase::Died()
+{
+	SetFrozen(true);
+	bDiedOrWounded = true;
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	GetWorld()->GetTimerManager().SetTimer(DestroyTimerHandle, this, &ACharacterBase::DestroyActor, 30.0f, false);
+
+}
+
+void ACharacterBase::DestroyActor()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Should be destroyed!!!!"));
+	Destroy();
+}
+
+void ACharacterBase::Healed()
+{
+	bDiedOrWounded = false;
+}
+
 void ACharacterBase::SetSkeletalMesh(USkeletalMesh *GeneratedSkeletalMesh)
 {
 	SkeletalMesh->SetSkeletalMesh(GeneratedSkeletalMesh, true);
@@ -170,7 +181,7 @@ void ACharacterBase::SetupCharacter(FCharacterSetupSettings CharacterSettings)
 	AIController->SetCharacterIsFrozen(CharacterSettings.bShouldBeFrozen);
 	CurrentStance = CharacterSettings.CharacterStance;
 	//Set behavior tree?
-	if(AIController == nullptr){UE_LOG(LogTemp, Warning, TEXT("ACharacterBase::SetupCharacter nullptr for AIController"))}
+	if(AIController == nullptr){UE_LOG(LogTemp, Warning, TEXT("ACharacterBase::SetupCharacter nullptr for AIController"));}
 	AIController->SetBehaviorTree(ECurrentStance::Attacking);
 	
 	//Change faction?

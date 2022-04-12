@@ -29,11 +29,20 @@ class NORTHERNCAMP_API ACharacterHero : public ACharacterSettler
 
 
 public:
+	//UPROPERTIES
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EHero HeroEnum;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	float MaxCameraDistance;
 	
+	//UFUNCTIONS
+	
+	//Functions
 	ACharacterHero();
+	void SetIsWounded(bool bWounded);
+
+	//Variables
+	bool bIsWounded;
+	
 };
