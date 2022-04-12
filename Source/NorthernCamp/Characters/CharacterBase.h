@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
 #include "CharacterBase.generated.h"
 
@@ -63,7 +64,10 @@ protected:
 	AAIControllerBase* AIController;
 	UVitalsComponentBase* VitalsComponent;
 	UAnimMontage* AttackAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Squad Settings")
 	float AttackRange = 100.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Squad Settings")
 	float WeaponDamage = 20.0f;
 
 public:	
@@ -79,13 +83,19 @@ public:
 	float GetAttackRange();
 	float GetWeaponDamage();
 	
-	//UFUNCTION()
 	void PlayAnimationMontage(UAnimMontage* MontageToPlay, bool bIsLooping);
 	void PauseAnimation(UAnimMontage* MontageToPause);
 	void ResumeAnimation(UAnimMontage* MontageToResume);
 	
-	//Variables
+	//UFUNCTION()
 
+	
+	//Variables
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Squad Settings")
+	bool bIsSquadLeader;
+	
+	ACharacterBase* CurrentSquadLeader;
+	bool bIsHero = false;
 
 
 	float CurrentSleep = 100.0f;

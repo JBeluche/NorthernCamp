@@ -63,7 +63,6 @@ public:
 
 	UVitalsComponent* GetCharacterVitalsComponent();
 
-	bool bIsHero = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Global Settings", meta = (AllowPrivateAccess = "true"))
 	float ActionRange = 100.0f;

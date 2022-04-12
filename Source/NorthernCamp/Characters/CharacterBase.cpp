@@ -46,7 +46,9 @@ ACharacterBase::ACharacterBase()
 	CharacterCustomizationComponent = CreateDefaultSubobject<UCharacterCustomizationComponent>(TEXT("Character Customization Component"));
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	bUseControllerRotationYaw = false;
 
 	AIControllerClass = AAIControllerBase::StaticClass();
 
@@ -74,6 +76,11 @@ void ACharacterBase::BeginPlay()
 	AIController->SetupController();
 
 
+	
+	
+
+
+
 }
 
 // Called every frame
@@ -81,6 +88,18 @@ void ACharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if(GetCharacterMovement()->Velocity.Size() > 0.0f)
+	{
+	
+		UE_LOG(LogTemp, Error, TEXT("%s is moving"), *GetName());
+		SetCanAffectNavigationGeneration(false, true) ;
+	}
+	else
+	{
+		SetCanAffectNavigationGeneration(true, true) ;
+	}		
+
+	
 }
 
 // Called to bind functionality to input
@@ -116,6 +135,7 @@ void ACharacterBase::ResumeAnimation(UAnimMontage* MontageToResume)
 {
 	SkeletalMesh->GetAnimInstance()->Montage_Resume(MontageToResume);
 }
+
 float ACharacterBase::GetAttackRange()
 {
 	return AttackRange;

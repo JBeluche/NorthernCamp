@@ -22,10 +22,10 @@ void UBTS_UpdateEnemyTarget::TickNode(UBehaviorTreeComponent &OwnerComp, uint8 *
 	//Get the perception and get the closest enemy
 
 	ACharacterBase* Character = Cast<ACharacterBase>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("SelfActor")));
-	AAIControllerBase* AIController = Cast<AAIControllerBase>(Character->GetController());
-	TArray<AActor*> PercievedActors;
-	AIController->PerceptionComponent->GetCurrentlyPerceivedActors( UAISense_Sight::StaticClass(), PercievedActors);
-	ACharacterBase* NearestEnemy = nullptr; ;
+	ACharacterBase* NearestEnemy = nullptr;
+	ACharacterBase* OldNearestEnemy = Cast<ACharacterBase>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AgresorBlackboardKeys::EnnemyTarget));
+
+
 	float NearestDistance = BIG_NUMBER;
 	
 	//Set the closest
@@ -41,7 +41,7 @@ void UBTS_UpdateEnemyTarget::TickNode(UBehaviorTreeComponent &OwnerComp, uint8 *
 				const float TempDistance = FVector::Dist(MyLocation, OtherPawnLocation); 
 				if (NearestDistance > TempDistance) 
 				{
-					//UE_LOG(LogTemp, Error, TEXT("Character: %s, found this character: %s to be closer"), *Character->GetName(), *PercievedCharacter->GetName());
+				//	UE_LOG(LogTemp, Error, TEXT("Character: %s, found this character: %s to be closer"), *Character->GetName(), *PercievedCharacter->GetName());
 					NearestDistance = TempDistance; 
 					NearestEnemy = PercievedCharacter; 
 				} 
@@ -49,46 +49,19 @@ void UBTS_UpdateEnemyTarget::TickNode(UBehaviorTreeComponent &OwnerComp, uint8 *
 		}
 	}
 	
-
-	/*
-	for(AActor* Actor : PercievedActors)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Character: %s, Percieved this character: %s"), *Character->GetName(), *Actor->GetName());
-
-
-		ACharacterBase* PercievedCharacter = Cast<ACharacterBase>(Actor);
-		if(PercievedCharacter != nullptr)
-		{
-			if(PercievedCharacter->Faction != Character->Faction)
-			{
-				FVector MyLocation = Character->GetActorLocation(); 
-				FVector OtherPawnLocation = PercievedCharacter->GetActorLocation(); 
-				const float TempDistance = FVector::Dist(MyLocation, OtherPawnLocation); 
-				if (NearestDistance > TempDistance) 
-				{
-					UE_LOG(LogTemp, Error, TEXT("Character: %s, found this character: %s to be closer"), *Character->GetName(), *PercievedCharacter->GetName());
-					NearestDistance = TempDistance; 
-					NearestEnemy = PercievedCharacter; 
-				} 
-			}
-		}
-	}*/
-
-
-
 	//Set closest enemy
 	if(NearestEnemy != nullptr)
 	{
-		if(Character->GetAttackRange() > (Character->GetActorLocation() - NearestEnemy->GetActorLocation()).Size())
+		if(NearestEnemy != OldNearestEnemy)
 		{
-			OwnerComp.GetBlackboardComponent()->SetValueAsBool(AgresorBlackboardKeys::bIsInRange, true);
-		}
-		else
-		{
-			OwnerComp.GetBlackboardComponent()->SetValueAsBool(AgresorBlackboardKeys::bIsInRange, false);
+			
+			//UE_LOG(LogTemp, Error, TEXT("Character: %s, setting character: %s as target"), *Character->GetName(), *NearestEnemy->GetName());
 
+			OwnerComp.GetBlackboardComponent()->ClearValue(AgresorBlackboardKeys::EnnemyTarget);
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), NearestEnemy);
 		}
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), NearestEnemy);
+		
+
 	}
 	else
 	{

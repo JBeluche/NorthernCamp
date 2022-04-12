@@ -23,5 +23,6 @@ void AFactionBattleController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
+	//
 
+}
