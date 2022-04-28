@@ -20,15 +20,12 @@ bool ULooseCameraControlsWidget::Initialize()
 	bool Success = Super::Initialize();
 	if(!Success) return false;
 
+	
 	if (!ensure(CampView != nullptr)) return false;
 	CampView->OnClicked.AddDynamic(this, &ULooseCameraControlsWidget::SwitchToCamp);
-	
-	if (!ensure(ButtonWill != nullptr)) return false;
-	ButtonWill->OnClicked.AddDynamic(this, &ULooseCameraControlsWidget::SwitchToWill);
+	/*
 
-	if (!ensure(ButtonTrader != nullptr)) return false;
-	ButtonTrader->OnClicked.AddDynamic(this, &ULooseCameraControlsWidget::SwitchToTrader);
-
+*/
 		
 	for (FConstPlayerControllerIterator iter = GetWorld()->GetPlayerControllerIterator(); iter; ++iter)
 	{
@@ -71,40 +68,6 @@ void ULooseCameraControlsWidget::SwitchToCamp()
 	PlayerController->SwitchPawn(ECurrentPawn::Camp);
 }
 
-
-void ULooseCameraControlsWidget::SwitchToWill()
-{
-	PlayerController->SetSelectedHero(EHero::Will);
-
-}
-void ULooseCameraControlsWidget::SwitchToTrader()
-{
-	PlayerController->SetSelectedHero(EHero::Trader);
-}
-void ULooseCameraControlsWidget::SwitchToHunter()
-{
-	
-}
-void ULooseCameraControlsWidget::SwitchToSeaclan()
-{
-	
-}
-void ULooseCameraControlsWidget::SwitchToMinedweler()
-{
-	
-}
-void ULooseCameraControlsWidget::SwitchToDruida()
-{
-	
-}
-void ULooseCameraControlsWidget::SwitchToAlchemist()
-{
-	
-}
-void ULooseCameraControlsWidget::SwitchToOccultist()
-{
-	
-}
 
 void ULooseCameraControlsWidget::UpdateResoucesAmountDisplayed()
 {

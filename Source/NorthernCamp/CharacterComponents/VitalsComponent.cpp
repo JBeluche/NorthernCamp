@@ -54,7 +54,7 @@ void UVitalsComponent::BeginPlay()
 
 void UVitalsComponent::UpdateVitals()
 {
-	if(Controller == nullptr){UE_LOG(LogTemp, Error, TEXT("VitalsComponent: I dont have a controller? te fuck? Settler: %s"), *GetReadableName());	return;	}
+	//if(Controller == nullptr){UE_LOG(LogTemp, Error, TEXT("VitalsComponent: I dont have a controller? te fuck? Settler: %s"), *GetReadableName());	return;	}
 
 	if(DayNightController)
 	{

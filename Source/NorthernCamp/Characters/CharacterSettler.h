@@ -22,6 +22,15 @@ enum class ESettlerSchedule : uint8
 };
 
 UENUM(BlueprintType)
+enum class EHairColor : uint8 
+{
+	Brown UMETA(DisplayName = "Brown"),
+	Blonde UMETA(DisplayName = "Blonde"),
+
+};
+
+
+UENUM(BlueprintType)
 enum class EWorkType : uint8 
 {
 	None UMETA(DisplayName = "None"),
@@ -60,6 +69,8 @@ public:
 	
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 	UVitalsComponent* OldVitalsComponent;
+
+	EHairColor HairColorEnum;
 
 	UVitalsComponent* GetCharacterVitalsComponent();
 

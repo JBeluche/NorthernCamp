@@ -22,8 +22,10 @@ ACharacterBase::ACharacterBase()
 	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	VitalsComponent = CreateDefaultSubobject<UVitalsComponentBase>(TEXT("Vitals Component"));
 
+
 	Mask->SetupAttachment(RootComponent);
 	SkeletalMesh->SetupAttachment(Mask);
+	SkeletalMesh->SetupAttachment(RootComponent);
 
 	//Because the charater mesh always looks the wrong way and is to high
 	FRotator NewRotation = SkeletalMesh->GetComponentRotation();
@@ -33,12 +35,6 @@ ACharacterBase::ACharacterBase()
 	
 	SkeletalMesh->SetRelativeRotation(NewRotation);
 	SkeletalMesh->SetRelativeLocation(NewPosition);
-
-	//Setting a cube, so clicking on actors is easier.
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> ReferenceObject(TEXT("/Game/_Character/Modular/Meshes/SKM_Polygon_Base"));
-	BaseMesh = ReferenceObject.Object;
-	GetMesh()->SetSkeletalMesh(BaseMesh);
-
 	
 	GetMesh()->SetRelativeRotation(NewRotation);
 	GetMesh()->SetRelativeLocation(NewPosition);
@@ -52,8 +48,13 @@ ACharacterBase::ACharacterBase()
 
 	AIControllerClass = AAIControllerBase::StaticClass();
 
+	//Animation
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> BP_AttackAnimation(TEXT("AnimMontage'/Game/_Character/Modular/Animations/Montage_AttackUnarmed.Montage_AttackUnarmed'"));
 	AttackAnimation = BP_AttackAnimation.Object;
+
+	const ConstructorHelpers::FClassFinder<UAnimInstance> BP_AnimaBp(TEXT("/Game/_Character/Modular/Animations/ABP_Poly"));
+	AnimBlueprintClass = BP_AnimaBp.Class;
+
 }
 
 // Called when the game starts or when spawned
@@ -61,16 +62,9 @@ void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
-	//GetCharacterMovement()->bUseRVOAvoidance = true;
-
-	GetMesh()->SetSkeletalMesh(nullptr);
-
-
 	SpawnDefaultController();
 
 	AIController = Cast<AAIControllerBase>(GetController());
-
 	if(AIController == nullptr){UE_LOG(LogTemp, Error, TEXT("ACharacterBase::BeginPlay nullptr for AIController")); return;}
 
 	AIController->SetupController();
@@ -90,7 +84,7 @@ void ACharacterBase::Tick(float DeltaTime)
 	else
 	{
 		SetCanAffectNavigationGeneration(true, true) ;
-	}		
+	}
 }
 
 // Called to bind functionality to input
@@ -99,9 +93,6 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
-
-// Todo
-// Make get componment and get animations with enums for componenets and animations
 
 UVitalsComponentBase* ACharacterBase::GetVitals()
 {
@@ -115,16 +106,26 @@ UAnimMontage* ACharacterBase::GetAttackAnimation()
 
 void ACharacterBase::PlayAnimationMontage(UAnimMontage* MontageToPlay, bool bIsLooping)
 {
+	if(SkeletalMesh->GetAnimInstance() == nullptr)	{UE_LOG(LogTemp, Warning, TEXT("ACharacterBase::PauseAnimation nulpptr GetAnimInstance")); return;	}
+
 	SkeletalMesh->GetAnimInstance()->Montage_Play(MontageToPlay, 1, EMontagePlayReturnType::MontageLength, 0.0f);
 }
 void ACharacterBase::PauseAnimation(UAnimMontage* MontageToPause)
 {
+	if(SkeletalMesh->GetAnimInstance() == nullptr)	{UE_LOG(LogTemp, Warning, TEXT("ACharacterBase::PauseAnimation nulpptr GetAnimInstance")); return;	}
 	SkeletalMesh->GetAnimInstance()->Montage_Pause(MontageToPause);
+
 }
 
 void ACharacterBase::ResumeAnimation(UAnimMontage* MontageToResume)
 {
+	if(SkeletalMesh->GetAnimInstance() == nullptr)	{UE_LOG(LogTemp, Warning, TEXT("ACharacterBase::PauseAnimation nulpptr GetAnimInstance")); return;	}
 	SkeletalMesh->GetAnimInstance()->Montage_Resume(MontageToResume);
+}
+
+TSubclassOf<UAnimInstance> ACharacterBase::GetAnimBpClass()
+{
+	return AnimBlueprintClass;
 }
 
 float ACharacterBase::GetAttackRange()

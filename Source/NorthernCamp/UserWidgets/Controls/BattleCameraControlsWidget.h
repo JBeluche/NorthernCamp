@@ -13,5 +13,10 @@ UCLASS()
 class NORTHERNCAMP_API UBattleCameraControlsWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
+	
+
+
+
 	
 };

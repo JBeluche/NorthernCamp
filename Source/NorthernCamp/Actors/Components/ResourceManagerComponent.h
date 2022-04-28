@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ResourcesPickupSpot.h"
 #include "Components/ActorComponent.h"
 #include "Engine/DataTable.h"
 #include "NorthernCamp/Controllers/ResourceController.h"
@@ -11,6 +10,8 @@
 #include "ResourceManagerComponent.generated.h"
 
 class ADayNightActorController;
+class UResourcesPickupSpot;
+
 enum class EResourceType : uint8;
 
 USTRUCT()

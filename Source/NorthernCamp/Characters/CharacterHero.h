@@ -13,8 +13,8 @@ enum class EHero : uint8
 	Will UMETA(DisplayName = "Will"),
 	Trader UMETA(DisplayName = "Trader"),
 	Hunter UMETA(DisplayName = "Hunter"),
-	Seaclan UMETA(DisplayName = "Seaclan"),
-	Miner UMETA(DisplayName = "Miner"),
+	SeaRaider UMETA(DisplayName = "SeaRaider"),
+	MineDweller UMETA(DisplayName = "MineDweller"),
 	Druida UMETA(DisplayName = "Druida"),
 	Alchemist UMETA(DisplayName = "Alchemist"),
 	Occultist UMETA(DisplayName = "Occultist"),
@@ -27,7 +27,10 @@ class NORTHERNCAMP_API ACharacterHero : public ACharacterSettler
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void BeginPlay() override;
 
+	
 public:
 	//UPROPERTIES
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

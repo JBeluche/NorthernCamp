@@ -4,10 +4,22 @@
 #include "NorthernCamp/Characters/CharacterHero.h"
 
 #include "Components/CapsuleComponent.h"
+#include "Components/CharacterCustomizationComponent.h"
 
 ACharacterHero::ACharacterHero()
 {
 	bIsHero = true;
+}
+
+void ACharacterHero::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if(HeroEnum == EHero::Will)
+	{
+		//CharacterCustomizationComponent->GenerateMeshes();
+		//CharacterCustomizationComponent->SetHead(EHead::01);
+	}
 }
 
 void ACharacterHero::SetIsWounded(bool bWounded)

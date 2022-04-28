@@ -32,7 +32,7 @@ void ARaidController::BeginPlay()
 	DaysSinceLastRaid = 0;
 	ANorthernCampGameMode* GameMode = Cast<ANorthernCampGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
-	DayEnded(1);
+	//DayEnded(1);
 
 	if(GameMode) 
 	{ 

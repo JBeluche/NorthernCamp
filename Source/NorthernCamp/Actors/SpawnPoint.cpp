@@ -3,7 +3,9 @@
 
 #include "NorthernCamp/Actors/SpawnPoint.h"
 
+#include "NavigationSystem.h"
 #include "Components/SphereComponent.h"
+#include "NorthernCamp/Characters/CharacterSettler.h"
 #include "NorthernCamp/Controllers/RaidController.h"
 
 // Sets default values
@@ -17,35 +19,17 @@ ASpawnPoint::ASpawnPoint()
 	
 	BoatDockingSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Spawn radius"));
 	BoatDockingSphere->SetupAttachment(SceneComponent);
-
-	//static ConstructorHelpers::FObjectFinder<UBlueprint> ItemBlueprint(TEXT("Blueprint'/Game/Blueprints/Pawns/BP_RaidingBoatActor.BP_RaidingBoatActor'"));
-
-	/*
-	if (ItemBlueprint.Object){
-		BoatBlueprint = (UClass*)ItemBlueprint.Object->GeneratedClass;
-	}
-
-	*/
-
 	
 	const ConstructorHelpers::FClassFinder<AActor> ItemBlueprint(TEXT("/Game/Blueprints/Pawns/BP_RaidingBoatActor"));
 
 	BoatBlueprintClass = ItemBlueprint.Class;
 
-	
-	/*const ConstructorHelpers::FClassFinder<AActor> BP_Raider01(TEXT("Blueprint'/Game/Blueprints/Characters/SeaRaiders/SeaRainder_01.SeaRainder_01'"));
-
-	RaiderBlueprintClass = BP_Raider01.Class;*/
-
-
-
 }
 
-// Called when the game starts or when spawned
+
 void ASpawnPoint::BeginPlay()
 {
 	Super::BeginPlay();
-	World = GetWorld();
 }
 
 void ASpawnPoint::SpawnRaiders(TArray<TSubclassOf<AActor>> RaidersClassToSpawn)
@@ -55,14 +39,14 @@ void ASpawnPoint::SpawnRaiders(TArray<TSubclassOf<AActor>> RaidersClassToSpawn)
 		ARaidingBoatActor* SpawnedBoat = SpawnBoat();
 		if(SpawnedBoat)
 		{
-			if (World){
+			if (GetWorld()){
 				FActorSpawnParameters SpawnParams;
 
 				//Foreach in the tmap
 				for (int32 i = 0; i < RaidersClassToSpawn.Num(); i++)
 				{
 					//if(!Cast<ACharacterBase>(RaidersClassToSpawn[i])){UE_LOG(LogTemp, Error, TEXT("ASpawnPoint::SpawnRaiders could not cast RaidersClassToSpawn")); return;}
-					ACharacterBase* SpawnedCharacter = World->SpawnActor<ACharacterBase>(RaidersClassToSpawn[i], GetActorLocation(), GetActorRotation(), SpawnParams);
+					ACharacterBase* SpawnedCharacter = GetWorld()->SpawnActor<ACharacterBase>(RaidersClassToSpawn[i], GetActorLocation(), GetActorRotation(), SpawnParams);
 					if (SpawnedCharacter){
 						FCharacterSetupSettings CharacterSetupSettings;
 						CharacterSetupSettings.CharacterStance = ECurrentStance::Attacking;
@@ -80,18 +64,56 @@ void ASpawnPoint::SpawnRaiders(TArray<TSubclassOf<AActor>> RaidersClassToSpawn)
 	}
 }
 
+ACharacterBase* ASpawnPoint::SpawnCharacter(TSubclassOf<AActor> CharactersToSpawn)
+{
+	FActorSpawnParameters SpawnParams;
+	
+	UNavigationSystemV1* NavigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+	if(NavigationSystem == nullptr){UE_LOG(LogTemp, Warning, TEXT("ASpawnPoint::SpawnCharacter nullptr NavigationSystem")); return nullptr;}
+	FNavLocation ResultLocation;
+	
+	NavigationSystem->GetRandomPointInNavigableRadius(GetActorLocation(), BoatDockingSphere->GetScaledSphereRadius(), ResultLocation);
+	ResultLocation.Location.Z = ResultLocation.Location.Z + 200.0f; 
+	if (GetWorld())
+	{
+		ACharacterBase* SpawnedCharacter = GetWorld()->SpawnActor<ACharacterBase>(CharactersToSpawn, ResultLocation.Location, GetActorRotation(), SpawnParams);
+
+		return SpawnedCharacter;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("nthere is no world!"));
+
+	}
+
+	return nullptr;
+
+}
+
 ARaidingBoatActor* ASpawnPoint::SpawnBoat()
 {
-	World = GetWorld();
-
-	if (World){
+	if (GetWorld()){
 		FActorSpawnParameters SpawnParams;
-		ARaidingBoatActor* SpawnedBoat = World->SpawnActor<ARaidingBoatActor>(BoatBlueprintClass, GetActorLocation(), GetActorRotation(), SpawnParams);
+		ARaidingBoatActor* SpawnedBoat = GetWorld()->SpawnActor<ARaidingBoatActor>(BoatBlueprintClass, GetActorLocation(), GetActorRotation(), SpawnParams);
 		if (SpawnedBoat){
 			return SpawnedBoat;
 		}
 	}
 
 	return nullptr;
+}
+
+bool ASpawnPoint::CanSpawn(UClass* ClassToCheck)
+{
+	for(UClass* Class : SpawnableClasses)
+	{
+		if(ClassToCheck == Class)
+		{
+			return true;
+		}
+	}
+	return false;
+
+
 }
 

@@ -135,7 +135,7 @@ void UUIController::UpdateUI(ECurrentUI NewCurrentUI)
 void UUIController::DisplayPopup(EPopup NewPopup)
 {
 
-	/*UE_LOG(LogTemp, Error, TEXT("Popup was added!"));
+	\
 
 	Overlay = CreateWidget<UUserWidget>(PlayerController, BlackOverlayWidget, FName("Overlay for popups"));
 	Overlay->AddToViewport();
@@ -157,13 +157,11 @@ void UUIController::DisplayPopup(EPopup NewPopup)
 	bIsInMenu = true;
 	bScrollingEnabled = false;
 
-	Popup->AddToViewport();*/
+	Popup->AddToViewport();
 }
 
 void UUIController::RemovePopup(EPopup PopupToRemove)
 {
-	UE_LOG(LogTemp, Error, TEXT("Popup was removed!"));
-/*
 	Overlay->RemoveFromViewport();
 	PlayerController->ResetControlls();
 	
@@ -177,6 +175,6 @@ void UUIController::RemovePopup(EPopup PopupToRemove)
 		{
 			MainUI->bIsEnabled = true;
 		}
-	}*/
+	}
 }
 

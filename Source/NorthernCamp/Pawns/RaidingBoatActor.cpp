@@ -112,9 +112,10 @@ void ARaidingBoatActor::AttachRaiders(TArray<ACharacterBase*> RaidersToAttach)
 void ARaidingBoatActor::Disembark()
 {
 	UNavigationSystemV1* NavigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+	if(NavigationSystem == nullptr){UE_LOG(LogTemp, Warning, TEXT("ARaidingBoatActor::Disembark nullptr NavigationSystem")); return;}
+
 	FNavLocation ResultLocation;
 
-	if(NavigationSystem == nullptr){UE_LOG(LogTemp, Warning, TEXT("ARaidingBoatActor::Disembark nullptr NavigationSystem")); return;}
 
 	//For each raider, get a free spot on the navmesh and move him there.
 	

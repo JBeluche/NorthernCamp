@@ -4,22 +4,10 @@
 
 #include "EngineUtils.h"
 #include "NorthernCampPlayerController.h"
-#include "NorthernCampCharacter.h"
-#include "UObject/ConstructorHelpers.h"
 
-
-///////
-// The game mode is handling the following:
-// 
-// 
-///////
 ANorthernCampGameMode::ANorthernCampGameMode()
 {
-	
-	
-	
 
-	
 }
 
 void ANorthernCampGameMode::BeginPlay()

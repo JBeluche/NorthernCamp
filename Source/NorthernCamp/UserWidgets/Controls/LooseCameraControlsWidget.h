@@ -26,11 +26,7 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* CampView;
 
-	UPROPERTY(meta = (BindWidget))
-	class UButton* ButtonWill;
 
-	UPROPERTY(meta = (BindWidget))
-	class UButton* ButtonTrader;
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* TB_Clock;
@@ -45,25 +41,6 @@ private:
 	
 	UFUNCTION()
 	void SwitchToCamp();
-
-	UFUNCTION()
-	void SwitchToWill();
-
-	UFUNCTION()
-	void SwitchToTrader();
-	UFUNCTION()
-	void SwitchToHunter();
-	UFUNCTION()
-	void SwitchToSeaclan();
-	UFUNCTION()
-	void SwitchToMinedweler();
-	UFUNCTION()
-	void SwitchToDruida();
-	UFUNCTION()
-	void SwitchToAlchemist();
-	UFUNCTION()
-	void SwitchToOccultist();
-	
 
 	ANorthernCampPlayerController* PlayerController;
 	UUserWidget* EntryWidget;

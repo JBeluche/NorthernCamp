@@ -7,50 +7,46 @@
 #include "Runtime/Engine/Classes/Materials/Material.h"
 #include "CharacterCustomizationComponent.generated.h"
 
+class ACharacterBase;
+UENUM()
+enum class EArmorLevel : uint8 
+{
+	Level_0 UMETA(DisplayName = "No Armor"),
+	Level_1 UMETA(DisplayName = "Leather 1 Armor"),
+	Level_2 UMETA(DisplayName = "Leather 2 Armor"),
+	Level_3 UMETA(DisplayName = "Leather 3 Armor"),
+	Level_4 UMETA(DisplayName = "Iron 1 Armor"),
+	Level_5 UMETA(DisplayName = "Iron 2 Armor"),
+	Level_6 UMETA(DisplayName = "Iron 3 Armor"),
+};
 
+UENUM()
+enum class EBodyType : uint8 
+{
+	PeasantLevel0 UMETA(DisplayName = "Peasant Body When Level 0"),
+	CustomLevel0 UMETA(DisplayName = "Custom Body When Level 0"),
+	CustomAllLevels UMETA(DisplayName = "The Character always has a custom body, doesnte use armor types"),
+
+};
 
 USTRUCT(BlueprintType)
-struct NORTHERNCAMP_API FStructColorParams
+struct FArmorMeshSet
 {
 	GENERATED_BODY()
-
-	//Color Values for the character
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skin Colors")
-	TArray <FLinearColor> SkinColorsArray;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skin Colors")
-	TArray <FLinearColor> PrimaryColorArray;
+	USkeletalMesh* Torso;
+	USkeletalMesh* ArmUpperRight;
+	USkeletalMesh* ArmUpperLeft;
+	USkeletalMesh* ArmLowerRight;
+	USkeletalMesh* ArmLowerLeft;
+	USkeletalMesh* HandRight;
+	USkeletalMesh* HandLeft;
+	USkeletalMesh* Hips;
+	USkeletalMesh* LegRight;
+	USkeletalMesh* LegLeft;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skin Colors")
-	TArray <FLinearColor> SecondaryColorArray;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skin Colors")
-	TArray <FLinearColor> MetalSecondaryColorArray;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skin Colors")
-	TArray <FLinearColor> MetalPrimaryColorArray;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skin Colors")
-	TArray <FLinearColor> MetalDarkColorArray;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skin Colors")
-	TArray <FLinearColor> LeatherPrimaryColorArray;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skin Colors")
-	TArray <FLinearColor> LeatherSecondaryColorArray;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skin Colors")
-	TArray <FLinearColor> BodyArtColorArray;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skin Colors")
-	TArray <FLinearColor> HairColorArray;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skin Colors")
-	TArray <FLinearColor> StubbleColorArray;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skin Colors")
-	TArray <FLinearColor> ScarColorArray;
 };
+
 
 
 
@@ -58,23 +54,42 @@ UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class NORTHERNCAMP_API UCharacterCustomizationComponent : public UActorComponent
 {
 	GENERATED_BODY()
-
-public:	
-	// Sets default values for this component's properties
-	UCharacterCustomizationComponent();
-
+	
 protected:
+	
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	USkeletalMesh* SkeletalMeshBaseFemale;
+	USkeletalMesh* SkeletalMeshBaseMale;
+
+	
 private:
 	TArray<USkeletalMesh*> MeshesToMerge;
 
+	ACharacterBase* Character;
+	EArmorLevel CurrentArmorLevel = EArmorLevel::Level_0;
+	
 public:	
+	// Sets default values for this component's properties
+	UCharacterCustomizationComponent();
+	void GenerateMeshes();
+	void SetArmorLevel(EArmorLevel NewArmorLevel);
 
-//Skeleton to set
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Body Parts")
-	USkeleton* Skeleton;
+	USkeleton* SkeletonToUse;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Body Parts")
+	USkeletalMesh* StaticBody;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Body Parts")
+	EBodyType CharacterBodyType = EBodyType::CustomLevel0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Body Parts")
+	bool bIsFemale;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Body Parts")
+	bool bHasCustomAnimation = false;
 
 //Body parts
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Body Parts")
@@ -118,6 +133,9 @@ public:
 		
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Body Parts")
 	USkeletalMesh* Hair;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Body Parts")
+	USkeletalMesh* ExtraHair;
 
 	//Attachments
 
@@ -247,15 +265,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mesh Merge")
 	void GenerateAllMaterials();
 
-	/*void SetColorSkin(uint8 Value);
-	void SetColorPrimary(uint8 Value);
-	void SetColorSecondary(uint8 Value);
-	void SetColorMetalPrimary(uint8 Value);
-	void SetColorMetalSecondary(uint8 Value);
-	void SetColorMetalDark(uint8 Value);
-	void SetColorLeatherPrimary(uint8 Value);
-	void SetColorLeatherSecondary(uint8 Value);
-	void SetColorHair(uint8 Value);
-	void SetColorBodyArt(uint8 Value);*/
+
 
 };

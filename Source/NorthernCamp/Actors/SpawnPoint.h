@@ -13,6 +13,7 @@
 #include "SpawnPoint.generated.h"
 
 
+class ACharacterSettler;
 UCLASS()
 class NORTHERNCAMP_API ASpawnPoint : public AActor
 {
@@ -36,13 +37,18 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components" )
 	int32 MaxPeopleToSpawn;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components" )
+	TArray<UClass*> SpawnableClasses;
 	
 	//Functions
 	ARaidingBoatActor* SpawnBoat();
 
 	
 	void SpawnRaiders(TArray<TSubclassOf<AActor>> RaidersClassToSpawn);
-
+	ACharacterBase* SpawnCharacter(TSubclassOf<AActor> CharactersToSpawn);
+	
+	bool CanSpawn(UClass* ClassToCheck);
 
 protected:
 	// Called when the game starts or when spawned

@@ -23,6 +23,8 @@ bool UGatherTaskEntryWidget::Initialize()
 }
 
 
+
+
 void UGatherTaskEntryWidget::Selected()
 {
 	for (FConstPlayerControllerIterator iter = GetWorld()->GetPlayerControllerIterator(); iter; ++iter)
@@ -33,6 +35,8 @@ void UGatherTaskEntryWidget::Selected()
 	{
 		return;
 	}
+
+	
 	
 	AcceptPopupWidget = WidgetTree->ConstructWidget<UUserWidget>(PlayerController->UIController->ConfirmationPopupWidget);
 

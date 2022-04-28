@@ -11,7 +11,6 @@ class UCharacterCustomizationComponent;
 class AAIControllerBase;
 class UVitalsComponentBase;
 
-//Enums
 UENUM()
 enum class ECurrentStance : uint8 
 {
@@ -65,11 +64,16 @@ protected:
 	UVitalsComponentBase* VitalsComponent;
 	UAnimMontage* AttackAnimation;
 	FTimerHandle DestroyTimerHandle;
+	TSubclassOf<UAnimInstance> AnimBlueprintClass;
 
+	//UPROPERTY
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Squad Settings")
 	float AttackRange = 100.0f;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Squad Settings")
 	float WeaponDamage = 20.0f;
+
+	
 
 public:	
 	// Called every frame
@@ -87,6 +91,7 @@ public:
 	void PlayAnimationMontage(UAnimMontage* MontageToPlay, bool bIsLooping);
 	void PauseAnimation(UAnimMontage* MontageToPause);
 	void ResumeAnimation(UAnimMontage* MontageToResume);
+	TSubclassOf<UAnimInstance>  GetAnimBpClass();
 	
 	//UFUNCTION()
 	UFUNCTION()
@@ -120,9 +125,6 @@ public:
 
 
 	//UPROPERTY
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Building)
-	USkeletalMesh* BaseMesh;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Mask;
 		
@@ -137,6 +139,5 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings", meta = (AllowPrivateAccess = "true"))
 	bool bDiedOrWounded;
-
 
 };
