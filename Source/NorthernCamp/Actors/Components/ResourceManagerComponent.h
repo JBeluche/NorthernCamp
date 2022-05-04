@@ -11,8 +11,8 @@
 
 class ADayNightActorController;
 class UResourcesPickupSpot;
+class AResourceController;
 
-enum class EResourceType : uint8;
 
 USTRUCT()
 struct FResourceInfo

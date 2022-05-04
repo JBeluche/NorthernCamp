@@ -3,9 +3,12 @@
 
 #include "NorthernCamp/Actors/SpawnPoint.h"
 
+#include "EngineUtils.h"
 #include "NavigationSystem.h"
 #include "Components/SphereComponent.h"
 #include "NorthernCamp/Characters/CharacterSettler.h"
+#include "NorthernCamp/Characters/Components/CharacterCustomizationComponent.h"
+#include "NorthernCamp/Controllers/GenerateSettlerController.h"
 #include "NorthernCamp/Controllers/RaidController.h"
 
 // Sets default values
@@ -66,6 +69,8 @@ void ASpawnPoint::SpawnRaiders(TArray<TSubclassOf<AActor>> RaidersClassToSpawn)
 
 ACharacterBase* ASpawnPoint::SpawnCharacter(TSubclassOf<AActor> CharactersToSpawn)
 {
+	UE_LOG(LogTemp, Warning, TEXT("SpawnCharacter!"));
+
 	FActorSpawnParameters SpawnParams;
 	
 	UNavigationSystemV1* NavigationSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
@@ -77,7 +82,8 @@ ACharacterBase* ASpawnPoint::SpawnCharacter(TSubclassOf<AActor> CharactersToSpaw
 	if (GetWorld())
 	{
 		ACharacterBase* SpawnedCharacter = GetWorld()->SpawnActor<ACharacterBase>(CharactersToSpawn, ResultLocation.Location, GetActorRotation(), SpawnParams);
-
+	
+		
 		return SpawnedCharacter;
 	}
 	else

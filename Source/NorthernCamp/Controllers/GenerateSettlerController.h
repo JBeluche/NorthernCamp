@@ -7,22 +7,6 @@
 #include "NorthernCamp/Characters/CharacterSettler.h"
 #include "GenerateSettlerController.generated.h"
 
-USTRUCT(BlueprintType)
-struct FHairValue
-{
-	GENERATED_BODY()
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Body Parts")
-	EHairColor HairColorID;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Body Parts")
-	FLinearColor LinearColor;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Body Parts")
-	float AmountPerTen;
-};
-
-
 UCLASS()
 class NORTHERNCAMP_API AGenerateSettlerController : public AActor
 {
@@ -31,6 +15,10 @@ class NORTHERNCAMP_API AGenerateSettlerController : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AGenerateSettlerController();
+
+	USkeletalMesh* GetRandomHairStyle();
+	USkeletalMesh* GetRandomBeardStyle();
+	FLinearColor GetRandomHairColor();
 
 protected:
 	// Called when the game starts or when spawned
@@ -42,9 +30,6 @@ protected:
 	//Posible hair/beard styles/colors Men
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Body Parts")
 	TMap<USkeletalMesh*, float> HairStylesMen;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Body Parts")
-	TArray<FHairValue> HairColorMenArray;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Body Parts")
 	TMap<USkeletalMesh*, float> BeardStyleMen;
@@ -68,9 +53,6 @@ protected:
 
 
 	//Functions
-	void SetHairColorToAdd();
 	void GenerateCharacter();
-	USkeletalMesh* GetRandomHairStyle();
-	USkeletalMesh* GetRandomBeardStyle();
-	FLinearColor GetRandomHairColor();
+
 };

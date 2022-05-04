@@ -32,7 +32,6 @@ void AGenerateSettlerController::BeginPlay()
 	Super::BeginPlay();
 
 	//Generate Characters
-	SetHairColorToAdd();
 	GenerateCharacter();
 
 
@@ -47,47 +46,50 @@ void AGenerateSettlerController::GenerateCharacter()
 
 		if(SpawnPoint->CanSpawn(ACharacterSettler::StaticClass()))
 		{
+			//ACharacterBase* NewCharacter = Cast<ACharacterBase>(SpawnPoint->SpawnCharacter(SettlerFemaleBaseClass));
+
+			ACharacterBase* Char;
+		
+		
+		
+		
+		
+			
+
+			
+
+
+			
+
+
+			//ACharacterBase* NewCharacter4 = Cast<ACharacterBase>(SpawnPoint->SpawnCharacter(SettlerMaleBaseClass));
+			for(int32 i = 0; i < 15; i++)
+			{
+				Char = SpawnPoint->SpawnCharacter(SettlerMaleBaseClass);
+
+				ACharacterBase* NewCharacter = Cast<ACharacterBase>(Char);
+
+				if(NewCharacter)
+				{
+					NewCharacter->CharacterCustomizationComponent->bIsFemale = false;
+
+					NewCharacter->CharacterCustomizationComponent->LinearColorHair = GetRandomHairColor();
+
+					NewCharacter->CharacterCustomizationComponent->Hair = GetRandomHairStyle();
+					NewCharacter->CharacterCustomizationComponent->FacialHair = GetRandomBeardStyle();
+
+					NewCharacter->CharacterCustomizationComponent->GenerateAllMaterials();
+					NewCharacter->CharacterCustomizationComponent->GenerateMeshes();
+				}
+
+			}
 			
 		}
 		
-		//ACharacterBase* NewCharacter = Cast<ACharacterBase>(SpawnPoint->SpawnCharacter(SettlerFemaleBaseClass));
+		
+
 
 		
-		ACharacterBase* NewCharacter2 = Cast<ACharacterBase>(SpawnPoint->SpawnCharacter(SettlerMaleBaseClass));
-	//	ACharacterBase* NewCharacter3 = Cast<ACharacterBase>(SpawnPoint->SpawnCharacter(SettlerMaleBaseClass));
-		//ACharacterBase* NewCharacter4 = Cast<ACharacterBase>(SpawnPoint->SpawnCharacter(SettlerMaleBaseClass));
-
-		
-		if(NewCharacter2)
-		{
-			NewCharacter2->CharacterCustomizationComponent->LinearColorHair = GetRandomHairColor();
-
-			NewCharacter2->CharacterCustomizationComponent->Hair = nullptr;
-			NewCharacter2->CharacterCustomizationComponent->FacialHair = GetRandomBeardStyle();
-
-			//NewCharacter2->CharacterCustomizationComponent->GenerateAllMaterials();
-			NewCharacter2->CharacterCustomizationComponent->GenerateMeshes();
-		}
-	/*	if(NewCharacter3)
-		{
-			NewCharacter3->CharacterCustomizationComponent->LinearColorHair = GetRandomHairColor();
-
-			NewCharacter3->CharacterCustomizationComponent->Hair = GetRandomHairStyle();
-			NewCharacter3->CharacterCustomizationComponent->FacialHair = GetRandomBeardStyle();
-
-			NewCharacter3->CharacterCustomizationComponent->GenerateAllMaterials();
-			NewCharacter3->CharacterCustomizationComponent->GenerateMeshes();
-		}
-		if(NewCharacter4)
-		{
-			NewCharacter4->CharacterCustomizationComponent->LinearColorHair = GetRandomHairColor();
-
-			NewCharacter4->CharacterCustomizationComponent->Hair = GetRandomHairStyle();
-			NewCharacter4->CharacterCustomizationComponent->FacialHair = GetRandomBeardStyle();
-
-			NewCharacter4->CharacterCustomizationComponent->GenerateAllMaterials();
-			NewCharacter4->CharacterCustomizationComponent->GenerateMeshes();
-		}*/
 	}
 }
 
@@ -103,8 +105,6 @@ USkeletalMesh* AGenerateSettlerController::GetRandomHairStyle()
 		{
 			if(!Settler->CharacterCustomizationComponent->bIsFemale)
 			{
-				UE_LOG(LogTemp, Error, TEXT("%s is none female"), *Settler->GetName());
-
 				TotalMen++;
 				if(HairStylesInMap.Contains(Settler->CharacterCustomizationComponent->Hair))
 				{
@@ -118,6 +118,9 @@ USkeletalMesh* AGenerateSettlerController::GetRandomHairStyle()
 			}
 		}
 	}
+	int32 RandomNum = FMath::RandRange(0, (HairStylesMen.Num() - 1));
+	int32 CurrentIteration = 0;
+	USkeletalMesh* RandomHairStyle = nullptr;
 
 	//Calculate which beard to set using the percentages allowed in the controller and which ones there are already in level
 	//For each beard we can use
@@ -133,13 +136,16 @@ USkeletalMesh* AGenerateSettlerController::GetRandomHairStyle()
 				return SKHair.Key;
 			}
 		}
-		else
+		//If it does'nt exists yet, just add it add a random one.
+		if(CurrentIteration == RandomNum)
 		{
-			//If it does'nt exists yet, just add it.
-			return SKHair.Key;
+			RandomHairStyle = SKHair.Key;
 		}
+		CurrentIteration++;
+
 	}
-	return nullptr;
+
+	return RandomHairStyle;
 }
 
 
@@ -169,7 +175,11 @@ USkeletalMesh* AGenerateSettlerController::GetRandomBeardStyle()
 			}
 		}
 	}
+	int32 RandomNum = FMath::RandRange(0, (BeardStyleMen.Num() - 1));
+	int32 CurrentIteration = 0;
+	USkeletalMesh* RandomBeardStyle = nullptr;
 
+	
 	//Calculate which beard to set using the percentages allowed in the controller and which ones there are already in level
 	//For each beard we can use
 	for(auto& SKBeard : BeardStyleMen)
@@ -183,133 +193,116 @@ USkeletalMesh* AGenerateSettlerController::GetRandomBeardStyle()
 				//If not, use it
 				return SKBeard.Key;
 			}
+			
 		}
-		else
+		//If it does'nt exists yet, add a random one.
+		if(CurrentIteration == RandomNum)
 		{
-			//If it does'nt exists yet, just add it.
-			return SKBeard.Key;
+			RandomBeardStyle = SKBeard.Key;
 		}
+		CurrentIteration++;
+
 	}
-	return nullptr;
+	return RandomBeardStyle;
 }
 
 FLinearColor AGenerateSettlerController::GetRandomHairColor()
 {
-	float TotalMen = 0.0f;
+	int32 TotalMen = 0;
 	
-	TMap<FLinearColor, float> HairColorsInMap;
+	TMap<FLinearColor, int32> HairColorsInMap;
 
 	//Calculate how many settlers on map and how many beards by type
 	for (TActorIterator<ACharacterSettler> Settler(GetWorld()); Settler; ++Settler)
 	{
 		if(Settler)
 		{
-			if(!Settler->CharacterCustomizationComponent->bIsFemale)
+			if(!Settler->bIsHero)
 			{
-				TotalMen++;
-				if(HairColorsInMap.Contains(Settler->CharacterCustomizationComponent->LinearColorHair))
+				
+				UE_LOG(LogTemp, Error, TEXT("Looping settlers"));
+					
+				if(!Settler->CharacterCustomizationComponent->bIsFemale)
 				{
-					HairColorsInMap.Emplace(Settler->CharacterCustomizationComponent->LinearColorHair, (HairColorsInMap[Settler->CharacterCustomizationComponent->LinearColorHair] + 1.0f));
+					TotalMen++;
+					if(HairColorsInMap.Contains(Settler->CharacterCustomizationComponent->LinearColorHair))
+					{
+						HairColorsInMap.Emplace(Settler->CharacterCustomizationComponent->LinearColorHair, (HairColorsInMap[Settler->CharacterCustomizationComponent->LinearColorHair] + 1.0f));
+					}
+					else
+					{
+						HairColorsInMap.Add(Settler->CharacterCustomizationComponent->LinearColorHair, 1);
+					}
 				}
-				else
-				{
-					HairColorsInMap.Add(Settler->CharacterCustomizationComponent->LinearColorHair, 1);
-				}
-
 			}
 		}
 	}
 	
 	//Calculate which beard to set using the percentages allowed in the controller and which ones there are already in level
 	//For each beard we can use
+	TMap<FLinearColor, float> MissingColors;
+	TMap<FLinearColor, float> ColorsLeft;
+
+	FLinearColor Blank;
+
+	//You want to get a random one first, but then you want to get one that has hair that is not yet in the game.
+		//The problem is that you are going to get all different colors, then it will be 
+	
+
+
+	//Filter colors that are already on the map.
 	for(auto& LColor : HairColorMen)
 	{
+		UE_LOG(LogTemp, Error, TEXT("Looping color"), LColor.Value, HairColorsInMap.Num(), TotalMen, LColor.Value);
+
 		//If the beard is already in the level
 		if(HairColorsInMap.Contains(LColor.Key))
 		{
+			UE_LOG(LogTemp, Error, TEXT("Color: %f, has a total of %i men using it | TotalMen %i"), LColor.Value, HairColorsInMap[LColor.Key], TotalMen);
+
+
 			//Check if there are to much of it. Beard amount, times 100, divided by total men = PercentageOfThisBeardType ? lower then allowed.
-			if(HairColorsInMap[LColor.Key] * 100.0f / TotalMen < HairColorMen[LColor.Key])
+			if(HairColorsInMap[LColor.Key] * 100.0f / TotalMen < LColor.Value)
 			{
 				//If not, use it
+				UE_LOG(LogTemp, Error, TEXT("There is not enought of these men, adding more"), LColor.Value);
+
 				return LColor.Key;
 			}
+				//UE_LOG(LogTemp, Error, TEXT("Adding color to missing array: %f"), LColor.Value);
+
+				MissingColors.Add(LColor.Key, 1.0f);
 		}
 		else
 		{
-			//If it does'nt exists yet, just add it.
-			return LColor.Key;
+
+			MissingColors.Add(LColor.Key, 1.0f);
+			UE_LOG(LogTemp, Error, TEXT("Adding color to missing array: %f"), LColor.Value);
+
+
 		}
 	}
-	FLinearColor Blank;
+
+	//If all the colors on the map already surpase their percentage, add a random 
+	int32 RandomNum = FMath::RandRange(0, MissingColors.Num() - 1);
+
+	//Being stupid
+	int32 CurrentlyAtIndex = 0;
+	for(auto& ColorToReturn : MissingColors)
+	{
+		UE_LOG(LogTemp, Error, TEXT("At index %i | random is %i | Array size: %i"), CurrentlyAtIndex, RandomNum, MissingColors.Num());
+		if(CurrentlyAtIndex == RandomNum)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Color setting to: %s"), *ColorToReturn.Key.ToString());
+
+			return ColorToReturn.Key;
+		}
+		CurrentlyAtIndex++;
+	}
 
 	return Blank;
 
-	
-	/*
-	FLinearColor Color;
-	SetHairColorToAdd();
-	for(FHairValue ColorStruct : HairColorMenArray)
-	{
-		if(HairColorMenToAdd == ColorStruct.HairColorID)
-		{
-			Color =	ColorStruct.LinearColor;
-		}
-	}
-	return Color;*/
-}
-
-void AGenerateSettlerController::SetHairColorToAdd()
-{
-	
-	float TotalBlondeHairMen = 0;
-	float TotalBrownHairMen = 0;
-	float TotalAmountOfCharacters = 0;
-	
-	//Get all characters on the map
-	for (TActorIterator<ACharacterSettler> ActorItr(GetWorld()); ActorItr; ++ActorItr) 
-	{ 
-		ACharacterSettler* Settler = Cast<ACharacterSettler>(*ActorItr);
-		if(Settler->HairColorEnum == EHairColor::Blonde)
-		{
-			TotalBlondeHairMen = TotalBlondeHairMen + 1.0f;
-		}
-		else if(Settler->HairColorEnum == EHairColor::Brown)
-		{
-			TotalBrownHairMen = TotalBrownHairMen + 1.0f;
-		}
-		TotalAmountOfCharacters++;
-	}
-
-	float PercentageOfBrownHairCurrently = (TotalBrownHairMen * 100) / TotalAmountOfCharacters;
-	float PercentageOfBlondeHairCurrently = (TotalBlondeHairMen * 100) / TotalAmountOfCharacters;
-
-	float BrownHairedPerTen;
-	float BlondeHairedPerTen;
-
-	//Get hair colors percentages by adding all of them together.
-	for(FHairValue ColorStruct : HairColorMenArray) 
-	{ 
-		if(ColorStruct.HairColorID == EHairColor::Blonde)
-		{
-			BlondeHairedPerTen =	ColorStruct.AmountPerTen;
-		}
-		if(ColorStruct.HairColorID == EHairColor::Brown)
-		{
-			BrownHairedPerTen =	ColorStruct.AmountPerTen;
-		}
-	}
-	
-	float PercentageOfBrownHairDesired = (BrownHairedPerTen * 100) / TotalAmountOfCharacters;
-	float PercentageOfBlondeHairDesired = (BlondeHairedPerTen * 100) / TotalAmountOfCharacters;
-
-	if(PercentageOfBrownHairCurrently < PercentageOfBrownHairDesired)
-	{
-		HairColorMenToAdd = EHairColor::Brown;
-	}
-	else if(PercentageOfBlondeHairCurrently < PercentageOfBlondeHairDesired)
-	{
-		HairColorMenToAdd = EHairColor::Blonde;
-	}
 
 }
+
 

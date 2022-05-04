@@ -62,6 +62,7 @@ protected:
 
 	USkeletalMesh* SkeletalMeshBaseFemale;
 	USkeletalMesh* SkeletalMeshBaseMale;
+	USkeletalMesh* GeneratedSkeletalMesh;
 
 	
 private:

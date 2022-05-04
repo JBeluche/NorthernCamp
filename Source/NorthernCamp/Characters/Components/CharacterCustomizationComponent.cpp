@@ -3,8 +3,10 @@
 
 #include "NorthernCamp/Characters/Components/CharacterCustomizationComponent.h"
 
+#include "EngineUtils.h"
 #include "NorthernCamp/BlueprintFunctions/MeshMergeFunctionLibrary.h"
 #include "NorthernCamp/Characters/CharacterBase.h"
+#include "NorthernCamp/Controllers/GenerateSettlerController.h"
 
 // Sets default values for this component's properties
 UCharacterCustomizationComponent::UCharacterCustomizationComponent()
@@ -40,56 +42,64 @@ UCharacterCustomizationComponent::UCharacterCustomizationComponent()
 void UCharacterCustomizationComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
 
+	
 	Character = Cast<ACharacterBase>(GetOwner());
 
-	if(Character && !bHasCustomAnimation)
+
+
+	if(Character)
 	{
-		Character->SkeletalMesh->SetSkeletalMesh(nullptr);
-		Character->GetMesh()->SetSkeletalMesh(nullptr);
-		
-		SetArmorLevel(CurrentArmorLevel);
-		
-		GenerateAllMaterials();
-		GenerateMeshes();
-		
-		Character->SkeletalMesh->SetAnimInstanceClass(Character->GetAnimBpClass());
-		Character->SkeletalMesh->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+		if(CharacterBodyType != EBodyType::CustomAllLevels)
+		{
+			SetArmorLevel(CurrentArmorLevel);
+
+			GenerateAllMaterials();
+			GenerateMeshes();
+		}
+
+
+		if(!bHasCustomAnimation)
+		{
+			Character->SkeletalMesh->SetAnimInstanceClass(Character->GetAnimBpClass());
+			Character->SkeletalMesh->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+		}
 	}
+
 }
 
 void UCharacterCustomizationComponent::GenerateMeshes()
 {
-	if(Hair == nullptr)
-	{
-		Character->SkeletalMesh->SetSkeletalMesh(nullptr);
-		Character->GetMesh()->SetSkeletalMesh(nullptr);
-		Character->Mask->SetSkeletalMesh(nullptr);
-	}
-	else
-	{
-		FSkeletalMeshMergeParams MergeParams;
-		MergeParams.MeshesToMerge = GetAllMeshesToMerge();
-
-		MergeParams.Skeleton = SkeletonToUse;
-		USkeletalMesh* GeneratedSkeletalMesh = UMeshMergeFunctionLibrary::MergeMeshes(MergeParams); 
-
-		if(IsValid(GeneratedSkeletalMesh))
-		{
-			Character->SetSkeletalMesh(GeneratedSkeletalMesh);
-
-		}
-	}
 	Character->SkeletalMesh->SetSkeletalMesh(nullptr);
 	Character->GetMesh()->SetSkeletalMesh(nullptr);
 	Character->Mask->SetSkeletalMesh(nullptr);
+	GeneratedSkeletalMesh = nullptr;
 
-	//Generate custom mesh
+	
+	FSkeletalMeshMergeParams MergeParams;
+	MergeParams.MeshesToMerge.Empty();
+
+	MergeParams.MeshesToMerge = GetAllMeshesToMerge();
+
+	MergeParams.Skeleton = SkeletonToUse;
+	
+	GeneratedSkeletalMesh = UMeshMergeFunctionLibrary::MergeMeshes(MergeParams);
+
+
+	if(IsValid(GeneratedSkeletalMesh))
+	{
+		Character->SetSkeletalMesh(GeneratedSkeletalMesh);
+
+	}
+
+
 
 }
 
 TArray<USkeletalMesh*> UCharacterCustomizationComponent::GetAllMeshesToMerge()
 {
+	MeshesToMerge.Empty();
 
 	if(Head) {MeshesToMerge.Add(Head);}
 	if(Eyebrows) {MeshesToMerge.Add(Eyebrows);}
@@ -142,7 +152,6 @@ TArray<USkeletalMesh*> UCharacterCustomizationComponent::GetAllMeshesToMerge()
 	if(HeadCoveringsNoFacialHair) {MeshesToMerge.Add(HeadCoveringsNoFacialHair);}
 	if(HeadCoveringsNoHair) {MeshesToMerge.Add(HeadCoveringsNoHair);}
 
-
 	return MeshesToMerge;
 }
 
@@ -180,10 +189,6 @@ void UCharacterCustomizationComponent::SetArmorLevel(EArmorLevel NewArmorLevel)
 {
 	CurrentArmorLevel = NewArmorLevel;
 
-
-	
-		
-	
 	if(NewArmorLevel == EArmorLevel::Level_0)
 	{
 		if(CharacterBodyType == EBodyType::PeasantLevel0)
@@ -214,7 +219,15 @@ void UCharacterCustomizationComponent::SetArmorLevel(EArmorLevel NewArmorLevel)
 	}
 	else if(NewArmorLevel == EArmorLevel::Level_1)
 	{
-		//Set all the meshes to the ones you want for level 1 armor.
+		if(NewArmorLevel == EArmorLevel::Level_0)
+		{
+			if(CharacterBodyType == EBodyType::PeasantLevel0)
+			{
+			
+			
+
+			}
+		}
 		
 	}
 	else if(NewArmorLevel == EArmorLevel::Level_2)
