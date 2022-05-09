@@ -14,10 +14,16 @@ ADayNightActorController::ADayNightActorController()
 	PrimaryActorTick.bCanEverTick = false;
 }
 
+
 // Called when the game starts or when spawned
 void ADayNightActorController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if(bDisableMovement)
+	{
+		return;
+	}
 
 	CurrentDay = 1;
 

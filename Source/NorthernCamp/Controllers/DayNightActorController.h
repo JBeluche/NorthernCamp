@@ -25,6 +25,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+
 public:	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -38,6 +39,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ADirectionalLight* SunLigth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bDisableMovement;
 
 	FTimerHandle TimerHandle;
 	ULightComponent* SunAndMoonLightComponent;

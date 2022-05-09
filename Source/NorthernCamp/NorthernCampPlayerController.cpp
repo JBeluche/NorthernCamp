@@ -38,8 +38,9 @@ void ANorthernCampPlayerController::BeginPlay()
 	SwitchPawn(ECurrentPawn::LooseCamera);
 	SetSelectedHero(EHero::Will);
 
-	//Setup basic stuff
-	GEngine->Exec( GetWorld(), TEXT( "r.Shadow.RadiusThreshold 0.01" ) );
+
+
+	
 
 
 }
