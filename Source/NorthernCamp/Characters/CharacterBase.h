@@ -24,7 +24,9 @@ enum class EFactions : uint8
 {
 	None UMETA(DisplayName = "None"),
 	Novard UMETA(DisplayName = "Novard"),
-	Raider UMETA(DisplayName = "Raider"),
+	SeaClan UMETA(DisplayName = "Sea Clan"),
+	Wolf UMETA(DisplayName = "Wolf"),
+	Bandit UMETA(DisplayName = "Bandit"),
 };
 
 //Structs
@@ -62,7 +64,6 @@ protected:
 	//Variables
 	AAIControllerBase* AIController;
 	UVitalsComponentBase* VitalsComponent;
-	UAnimMontage* AttackAnimation;
 	FTimerHandle DestroyTimerHandle;
 	TSubclassOf<UAnimInstance> AnimBlueprintClass;
 
@@ -72,8 +73,10 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Squad Settings")
 	float WeaponDamage = 20.0f;
-
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Squad Settings")
+	UAnimMontage* AttackAnimation;
+
 
 public:	
 	// Called every frame

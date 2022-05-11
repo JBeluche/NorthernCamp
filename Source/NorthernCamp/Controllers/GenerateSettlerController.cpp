@@ -48,22 +48,8 @@ void AGenerateSettlerController::GenerateCharacter()
 		{
 			//ACharacterBase* NewCharacter = Cast<ACharacterBase>(SpawnPoint->SpawnCharacter(SettlerFemaleBaseClass));
 
-			ACharacterBase* Char;
-		
-		
-		
-		
-		
-			
-
-			
-
-
-			
-
-
 			//ACharacterBase* NewCharacter4 = Cast<ACharacterBase>(SpawnPoint->SpawnCharacter(SettlerMaleBaseClass));
-			for(int32 i = 0; i < 15; i++)
+			/*for(int32 i = 0; i < 15; i++)
 			{
 				Char = SpawnPoint->SpawnCharacter(SettlerMaleBaseClass);
 
@@ -82,7 +68,7 @@ void AGenerateSettlerController::GenerateCharacter()
 					NewCharacter->CharacterCustomizationComponent->GenerateMeshes();
 				}
 
-			}
+			}*/
 			
 		}
 		

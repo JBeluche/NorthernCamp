@@ -8,12 +8,6 @@
 #include "NorthernCamp/Characters/CharacterBase.h"
 #include "RaidController.generated.h"
 
-enum class ECharacter : uint8 
-{
-	SeaRaider_01 UMETA(DisplayName = "Sea Raider 01"),
-
-};
-
 USTRUCT(BlueprintType)
 struct FRaidInfo
 {
@@ -28,7 +22,7 @@ struct FRaidInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Raid Settings")
 	int32 HourToSpawn;
 
-	TArray<TSubclassOf<AActor>> RaidersClassToSpawn;
+	TArray<TSubclassOf<AActor>> ClassToSpawn;
 
 };
 
@@ -42,25 +36,57 @@ public:
 	ARaidController();
 
 	//Variables
-	int32 DaysSinceLastRaid;
 	float CurrentBaseLevel;
 	float RaidStrength;
 	float LastRaidStrength; //The strength of the last raid, so you don't bring the best every time.
+	TArray<EFactions> FactionsRaidPriority;
 	
 	
 	//Functions
-	float CalculateBaseLevel(); //Returns CurrentBaseLevel
-	void SpawnRaid(FRaidInfo RaidInfo);
-	bool RandomRaidCheck();
+	float GetBaseLevel(); //Returns CurrentBaseLevel
+	FRaidInfo GetRaid(float CurrentDay);
+	FRaidInfo CreateRaid(EFactions Faction);
+
+
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Rate", meta = (AllowPrivateAccess = "true"))
+	TMap<EFactions, int32> DaysSinceLastRaid;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Rate", meta = (AllowPrivateAccess = "true"))
+	TMap<EFactions, int32> FactionSpawnDayRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Rate", meta = (AllowPrivateAccess = "true"))
+	TMap<EFactions, int32> FactionSpawnDayRateRandomBuffer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Rate", meta = (AllowPrivateAccess = "true"))
+	TMap<EFactions, int32> FactionsStartingHourSpawn;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Rate", meta = (AllowPrivateAccess = "true"))
+	TMap<EFactions, int32> FactionsEndingHourSpawn;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Rate", meta = (AllowPrivateAccess = "true"))
+	ADayNightActorController* DayNightController;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	TSubclassOf<AActor> RaiderBlueprintClass;
-
+	TSubclassOf<AActor> Raider01BlueprintClass;
+	TSubclassOf<AActor> Bandit01BlueprintClass;
+	TSubclassOf<AActor> Wolf01BlueprintClass;
+	FRaidInfo RaidToSpawn;
 
 	UFUNCTION() 
 	void DayEnded(float CurrentDay);
+
+	UFUNCTION() 
+	void CheckRaid(float CurrentHour);
+	
+	void SpawnRaid(FRaidInfo RaidInfo);
+
+	//Can be the future, can be the past.
+	TMap<EFactions, int32> FactionLastRaidDay;
+	TMap<EFactions, int32> FactionPlannedRaidDay;
+
 
 };

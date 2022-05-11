@@ -37,13 +37,27 @@ void ASpawnPoint::BeginPlay()
 
 void ASpawnPoint::SpawnRaiders(TArray<TSubclassOf<AActor>> RaidersClassToSpawn)
 {
+	FActorSpawnParameters SpawnParams;
+	SpawnedRaiders.Empty();
+
+	for (int32 i = 0; i < RaidersClassToSpawn.Num(); i++)
+	{
+		ACharacterBase* SpawnedCharacter = GetWorld()->SpawnActor<ACharacterBase>(RaidersClassToSpawn[i], GetActorLocation(), GetActorRotation(), SpawnParams);
+		if (SpawnedCharacter){
+			FCharacterSetupSettings CharacterSetupSettings;
+			CharacterSetupSettings.CharacterStance = ECurrentStance::Attacking;
+			SpawnedCharacter->SetupCharacter(CharacterSetupSettings);
+			//This should be deleted
+			SpawnedRaiders.Add(SpawnedCharacter);
+		}
+	}
+	/*
 	if(bIsBoatSpawn)
 	{
 		ARaidingBoatActor* SpawnedBoat = SpawnBoat();
 		if(SpawnedBoat)
 		{
 			if (GetWorld()){
-				FActorSpawnParameters SpawnParams;
 
 				//Foreach in the tmap
 				for (int32 i = 0; i < RaidersClassToSpawn.Num(); i++)
@@ -64,7 +78,8 @@ void ASpawnPoint::SpawnRaiders(TArray<TSubclassOf<AActor>> RaidersClassToSpawn)
 
 			}
 		}
-	}
+	}*/
+
 }
 
 ACharacterBase* ASpawnPoint::SpawnCharacter(TSubclassOf<AActor> CharactersToSpawn)
