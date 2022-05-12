@@ -28,7 +28,7 @@ void ALooseCameraPawn::BeginPlay()
 	Super::BeginPlay();
 
 	CameraBoom->bDoCollisionTest = false;
-	if(CameraHeight < 1000.0f){CameraHeight = 1000.0f;}
+	
 
 	
 }
